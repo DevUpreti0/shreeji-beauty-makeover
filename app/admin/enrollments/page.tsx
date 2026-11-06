@@ -1,0 +1,13 @@
+import Link from "next/link";
+import {redirect} from "next/navigation";
+import {isAdminSessionValid} from "@/lib/admin-session";
+import {createAdminDb} from "@/lib/supabase/admin";
+export const dynamic="force-dynamic";
+export default async function EnrollmentsPage(){
+ if(!await isAdminSessionValid())redirect("/login");
+ const db=createAdminDb();const {data:items,error}=await db.from("enrollments").select("id,student_id,course_id,status,enrolled_at").order("enrolled_at",{ascending:false}).limit(250);
+ const rows=items||[];const studentIds=[...new Set(rows.map(x=>x.student_id))],courseIds=[...new Set(rows.map(x=>x.course_id))];
+ const [{data:students},{data:courses}]=await Promise.all([studentIds.length?db.from("profiles").select("id,full_name").in("id",studentIds):Promise.resolve({data:[] as any[]}),courseIds.length?db.from("courses").select("id,title").in("id",courseIds):Promise.resolve({data:[] as any[]})]);
+ const studentNames=new Map((students||[]).map(x=>[x.id,x.full_name||"Learner"])),courseNames=new Map((courses||[]).map(x=>[x.id,x.title]));
+ return <main className="portalPage"><header className="portalHeader"><Link href="/admin" className="brand">← ADMIN DASHBOARD</Link></header><section className="portalContent"><div className="eyebrow">LEARNER ACCESS</div><h1>Course <em>enrollments.</em></h1><p>Review learner-to-course access records. This view does not create paid access or modify payment state.</p>{error&&<p className="formMessage">Could not load enrollments. Check Supabase service-role configuration.</p>}<div className="portalMetrics"><div><small>ENROLLMENTS SHOWN</small><strong>{rows.length}</strong></div><div><small>UNIQUE LEARNERS</small><strong>{new Set(rows.map(x=>x.student_id)).size}</strong></div><div><small>COURSES REPRESENTED</small><strong>{new Set(rows.map(x=>x.course_id)).size}</strong></div></div><div className="portalPanel" style={{overflowX:"auto",marginTop:20}}><table style={{width:"100%",borderCollapse:"collapse",minWidth:650}}><thead><tr><th align="left">Learner</th><th align="left">Course</th><th align="left">Status</th><th align="left">Enrolled</th><th align="left">Record ID</th></tr></thead><tbody>{rows.map(x=><tr key={x.id}><td style={{padding:10,borderTop:"1px solid #eee"}}>{studentNames.get(x.student_id)||"Learner"}</td><td style={{padding:10,borderTop:"1px solid #eee"}}>{courseNames.get(x.course_id)||"Course"}</td><td style={{padding:10,borderTop:"1px solid #eee"}}>{x.status}</td><td style={{padding:10,borderTop:"1px solid #eee"}}>{new Date(x.enrolled_at).toLocaleDateString("en-IN")}</td><td style={{padding:10,borderTop:"1px solid #eee",fontSize:11}}>{x.id}</td></tr>)}</tbody></table>{!rows.length&&!error&&<p>No enrollments recorded yet.</p>}</div></section></main>;
+}

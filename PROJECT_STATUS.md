@@ -5,7 +5,7 @@
 - Region: Mumbai (`ap-south-1`)
 - Project status at creation: `ACTIVE_HEALTHY`
 - Quoted project cost confirmed: $0/month
-- Three LMS migrations are applied: core schema, public-vs-authenticated RLS policies/admin role permissions, and private-schema security-definer helpers.
+- Four LMS migrations are applied: core schema, public-vs-authenticated RLS policies/admin role permissions, and private-schema security-definer helpers.
 - Verified 12 public LMS tables exist and RLS is enabled on all 12.
 - Supabase security advisor returned no security lint findings after the helper-function hardening.
 

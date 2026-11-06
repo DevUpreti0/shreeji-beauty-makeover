@@ -1,31 +1,34 @@
 # Shreeji Beauty Makeover
 
-A Next.js 15 learning platform for beauty and makeup courses.
+Next.js 15 beauty-learning platform starter with Supabase-backed account flows and a secure server-side admin area.
 
-## Run locally
+## Local development
 ```bash
 npm install
 npm run dev
 ```
 
-## Backend foundation committed
-- Supabase browser/server clients
-- Student email/password signup and login
-- Server-verified teacher/student role checks
-- Admin ID/password login with an HTTP-only, signed 8-hour session cookie
-- Protected admin, student and teacher portal pages
-- PostgreSQL schema for profiles, courses, modules, lessons, enrollments, progress, payments, live sessions, certificates and platform settings
-- Row-level security policies and automatic student profile creation
+## Included
+- Responsive public website and course catalogue
+- Student signup/login through Supabase Auth
+- Teacher workspace and teacher-owned draft course creation
+- Protected admin login with an HTTP-only signed session
+- Admin overview, user directory, role assignment, course creation/status management and platform settings
+- LMS schema migration with row-level security policies
 
-## Required one-time setup
-1. Create/connect a Supabase project.
-2. Run `supabase/schema.sql` in the Supabase SQL Editor.
-3. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to Vercel.
-4. Add the server-only `SUPABASE_SERVICE_ROLE_KEY` only to Vercel (never commit it).
-5. Add `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, and `ADMIN_SESSION_SECRET` in Vercel Project Settings > Environment Variables. Set them for Production and Preview. Keep them encrypted/sensitive; do not add them to GitHub or any `NEXT_PUBLIC_*` variable.
-6. Redeploy after adding environment variables.
+## Required environment variables
+Copy `.env.example` to `.env.local` and populate:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (server only; never expose in client code)
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+- `ADMIN_SESSION_SECRET` (32+ random characters)
 
-The admin ID configured for the initial account is `dukubusiness`. Its password is checked using a salted scrypt hash stored in Vercel as `ADMIN_PASSWORD_HASH`; the plaintext is not stored in GitHub or Vercel.
+Admin credentials are checked server-side and the session cookie is HTTP-only, secure in production, same-site strict and expires after 8 hours. Never commit secrets to Git.
 
-## Important limitations
-Payments, secure video storage, certificates, email delivery and real-time meeting rooms still require provider setup and verified server-side integrations. Do not accept real payments until checkout, webhook signature verification and enrollment creation are implemented and tested.
+## Database setup
+Apply `supabase/migrations/202611060001_initial_lms.sql` to the Supabase project. The migration creates profiles, courses, modules, lessons, enrollments, progress, payments, live sessions, attendance, platform settings and audit logs, with row-level security.
+
+## Not connected yet
+A live payment provider, video hosting, certificates, email delivery and live meeting provider still require provider accounts/credentials and additional integration. Course checkout and live classes must not be represented as active until those integrations are verified.

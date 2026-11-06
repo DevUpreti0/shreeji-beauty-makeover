@@ -50,6 +50,7 @@ create table public.enrollments (
   id uuid primary key default gen_random_uuid(),
   student_id uuid not null references public.profiles(id) on delete cascade,
   course_id uuid not null references public.courses(id) on delete cascade,
+  status text not null default 'active' check (status in ('pending','active','completed','refunded','cancelled')),
   enrolled_at timestamptz not null default now(),
   unique(student_id,course_id)
 );

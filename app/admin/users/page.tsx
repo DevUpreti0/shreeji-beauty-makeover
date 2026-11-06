@@ -3,6 +3,7 @@ import {redirect} from "next/navigation";
 import {revalidatePath} from "next/cache";
 import {isAdminSessionValid} from "@/lib/admin-session";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
+import {createAdminDb} from "@/lib/supabase/admin";
 export const dynamic="force-dynamic";
 async function updateRole(formData:FormData){
  "use server";

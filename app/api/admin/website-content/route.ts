@@ -14,6 +14,9 @@ export async function PUT(req:NextRequest){
   const navItems=Array.isArray(b.navItems)?b.navItems.slice(0,8).map((x:any)=>maxText(x,40)).filter(Boolean):["Home","Courses","About","Contact"];
   const value={
    brandName:maxText(b.brandName,100),brandTagline:maxText(b.brandTagline,120),logoUrl:maxText(b.logoUrl,1000),announcement:maxText(b.announcement,240),
+   heroEyebrow:maxText(b.heroEyebrow,120),heroSecondaryCtaText:maxText(b.heroSecondaryCtaText,100),trustbarLabel:maxText(b.trustbarLabel,100),trustbarItems:Array.isArray(b.trustbarItems)?b.trustbarItems.slice(0,6).map((x:any)=>maxText(x,80)):[],
+   featureEyebrow:maxText(b.featureEyebrow,120),featurePoints:Array.isArray(b.featurePoints)?b.featurePoints.slice(0,6).map((x:any)=>maxText(x,120)):[],whyEyebrow:maxText(b.whyEyebrow,120),whyHeading:maxText(b.whyHeading,120),whyAccent:maxText(b.whyAccent,120),
+   visibleSections:{hero:b.visibleSections?.hero!==false,trustbar:b.visibleSections?.trustbar!==false,courses:b.visibleSections?.courses!==false,featureBand:b.visibleSections?.featureBand!==false,why:b.visibleSections?.why!==false},
    heroLine1:maxText(b.heroLine1,120),heroLine2:maxText(b.heroLine2,120),heroAccent:maxText(b.heroAccent,120),heroDescription:maxText(b.heroDescription,800),heroImageUrl:maxText(b.heroImageUrl,1000),heroCtaText:maxText(b.heroCtaText,80),heroCtaUrl:maxText(b.heroCtaUrl,500),
    coursesHeading:maxText(b.coursesHeading,160),coursesDescription:maxText(b.coursesDescription,500),featureHeading:maxText(b.featureHeading,180),featureDescription:maxText(b.featureDescription,800),
    aboutHeading:maxText(b.aboutHeading,160),aboutDescription:maxText(b.aboutDescription,1000),contactHeading:maxText(b.contactHeading,160),contactDescription:maxText(b.contactDescription,1000),contactEmail:maxText(b.contactEmail,180),footerTagline:maxText(b.footerTagline,180),
@@ -23,5 +26,5 @@ export async function PUT(req:NextRequest){
   const db=createAdminDb();const {error}=await db.from("platform_settings").upsert({key:"website_content",value,updated_at:new Date().toISOString()},{onConflict:"key"});if(error)throw error;
   revalidatePath("/");revalidatePath("/admin/website");revalidatePath("/pages/[slug]","page");
   return NextResponse.json({ok:true});
- }catch(e){return NextResponse.json({error:"Could not publish website content. Please retry."},{status:500});}
+ }catch{return NextResponse.json({error:"Could not publish website content. Please retry."},{status:500});}
 }

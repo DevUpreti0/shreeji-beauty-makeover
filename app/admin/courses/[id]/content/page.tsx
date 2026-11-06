@@ -7,7 +7,7 @@ import VideoUploadField from "./video-upload-field";
 export const dynamic="force-dynamic";
 async function updateCourse(form:FormData){
  "use server";if(!await isAdminSessionValid())redirect("/login");const id=String(form.get("course_id")||"");
- const title=String(form.get("title")||"").trim().slice(0,160),description=String(form.get("description")||"").trim().slice(0,5000),category=String(form.get("category")||"General").trim().slice(0,80),level=String(form.get("level")||"Beginner").trim().slice(0,80),price=Math.round(Number(form.get("price")||0)*100),thumbnail=String(form.get("thumbnail_url")||"").trim().slice(0,1000);
+ const title=String(form.get("title")||"").trim().slice(0,160),description=String(form.get("description")||"").trim().slice(0,5000),category=String(form.get("category")||"General").trim().slice(0,80),level=String(form.get("level")||"Beginner").trim().slice(0,80),price=Math.round(Number(form.get("price")||0)*100),thumbnail=String(form.get("thumbnail_url")||"").trim().slice(0,1000),teacherId=String(form.get("teacher_id")||"").trim()||null;
  if(!id||!title||!Number.isSafeInteger(price)||price<0)throw new Error("Enter valid course details.");const db=createAdminDb();if(teacherId){const {data:teacher}=await db.from("profiles").select("id").eq("id",teacherId).eq("role","teacher").maybeSingle();if(!teacher)throw new Error("Choose a valid teacher account.");}const {error}=await db.from("courses").update({title,description,category,level,price_paise:price,thumbnail_url:thumbnail||null,teacher_id:teacherId,updated_at:new Date().toISOString()}).eq("id",id);if(error)throw new Error("Could not update course.");revalidatePath("/admin/courses/"+id+"/content");revalidatePath("/");
 }
 async function addModule(form:FormData){

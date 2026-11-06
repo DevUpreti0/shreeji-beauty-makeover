@@ -1,0 +1,3 @@
+import Link from "next/link";import {redirect} from "next/navigation";import {isAdminSessionValid} from "@/lib/admin-session";import CourseManager from "./manager";
+export const dynamic="force-dynamic";
+export default async function AdminCourses(){if(!await isAdminSessionValid())redirect("/login");return <main className="portalPage"><header className="portalHeader"><Link href="/admin" className="brand">← ADMIN DASHBOARD</Link></header><section className="portalContent"><div className="eyebrow">CATALOGUE ADMINISTRATION</div><h1>Course <em>management.</em></h1><p>Create and manage courses stored in your database.</p><CourseManager/></section></main>}

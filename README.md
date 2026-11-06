@@ -1,30 +1,31 @@
 # Shreeji Beauty Makeover
 
-A premium, responsive Next.js 15 starter for a beauty-learning platform.
+A Next.js 15 learning platform for beauty and makeup courses.
 
 ## Run locally
 ```bash
 npm install
 npm run dev
 ```
-Open http://localhost:3000.
 
-## Included in this starter
-- Responsive public landing page and course catalogue
-- Course search, category filters and course preview dialogs
-- Student, teacher and admin dashboard previews
-- Login/signup interface with role selector (demo only)
-- DuKu Meet branded meeting lobby preview at `/meeting`
+## Backend foundation committed
+- Supabase browser/server clients
+- Student email/password signup and login
+- Server-verified teacher/student role checks
+- Admin ID/password login with an HTTP-only, signed 8-hour session cookie
+- Protected admin, student and teacher portal pages
+- PostgreSQL schema for profiles, courses, modules, lessons, enrollments, progress, payments, live sessions, certificates and platform settings
+- Row-level security policies and automatic student profile creation
 
-## Important: production integrations are not yet enabled
-The current login form is a UI demo and does not create or authenticate accounts. Dashboard metrics are sample values. Course enrolment and checkout are previews only. No live video meeting provider is connected.
+## Required one-time setup
+1. Create/connect a Supabase project.
+2. Run `supabase/schema.sql` in the Supabase SQL Editor.
+3. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to Vercel.
+4. Add the server-only `SUPABASE_SERVICE_ROLE_KEY` only to Vercel (never commit it).
+5. Add `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `ADMIN_SESSION_SECRET` in Vercel Project Settings > Environment Variables. Set them for Production and Preview. Keep them encrypted/sensitive; do not add them to GitHub or any `NEXT_PUBLIC_*` variable.
+6. Redeploy after adding environment variables.
 
-Before accepting real students or payments:
-1. Create a Supabase project and apply a reviewed schema with row-level security.
-2. Implement Supabase Auth, email verification, role checks and server-side authorization.
-3. Configure secure media/video storage and upload limits.
-4. Integrate a payment provider (such as Razorpay) using server-side secrets, webhook signature validation and verified payment records.
-5. Connect a live meeting provider with authenticated server-side room creation.
-6. Add email delivery, privacy policy, terms, backups and monitoring.
+The admin ID configured for the initial account is `dukubusiness`. Set its password in Vercel as `ADMIN_PASSWORD`; it is intentionally not stored in this repository.
 
-Never expose Supabase service-role keys, payment secrets or meeting API secrets in browser code.
+## Important limitations
+Payments, secure video storage, certificates, email delivery and real-time meeting rooms still require provider setup and verified server-side integrations. Do not accept real payments until checkout, webhook signature verification and enrollment creation are implemented and tested.

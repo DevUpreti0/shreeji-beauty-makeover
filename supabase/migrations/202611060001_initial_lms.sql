@@ -98,6 +98,14 @@ create table public.attendance (
   left_at timestamptz,
   unique(session_id,student_id)
 );
+create table public.certificates (
+  id uuid primary key default gen_random_uuid(),
+  student_id uuid not null references public.profiles(id) on delete cascade,
+  course_id uuid not null references public.courses(id) on delete cascade,
+  certificate_number text not null unique,
+  issued_at timestamptz not null default now(),
+  unique(student_id,course_id)
+);
 create table public.platform_settings (
   key text primary key,
   value jsonb not null default '{}'::jsonb,
@@ -146,6 +154,7 @@ alter table public.lesson_progress enable row level security;
 alter table public.payments enable row level security;
 alter table public.live_sessions enable row level security;
 alter table public.attendance enable row level security;
+alter table public.certificates enable row level security;
 alter table public.platform_settings enable row level security;
 alter table public.audit_logs enable row level security;
 
@@ -185,6 +194,8 @@ using (teacher_id=auth.uid() or public.current_user_role()='admin' or exists(sel
 create policy "teachers manage own sessions" on public.live_sessions for all to authenticated
 using (teacher_id=auth.uid() or public.current_user_role()='admin')
 with check (teacher_id=auth.uid() or public.current_user_role()='admin');
+create policy "students see own certificates" on public.certificates for select to authenticated
+using (student_id=auth.uid() or public.current_user_role()='admin');
 create policy "attendance own or teacher" on public.attendance for select to authenticated
 using (student_id=auth.uid() or public.current_user_role()='admin' or exists(select 1 from public.live_sessions s where s.id=session_id and s.teacher_id=auth.uid()));
 create policy "attendance student update own" on public.attendance for all to authenticated
@@ -196,9 +207,10 @@ using (public.current_user_role()='admin');
 
 grant usage on schema public to anon, authenticated;
 grant select on public.courses, public.modules, public.lessons to anon,authenticated;
-grant select,update on public.profiles to authenticated;
+grant select on public.profiles to authenticated;
+grant update(full_name,avatar_url) on public.profiles to authenticated;
 grant select,insert,update,delete on public.courses,public.modules,public.lessons to authenticated;
-grant select on public.enrollments,public.payments,public.live_sessions,public.attendance to authenticated;
+grant select on public.enrollments,public.payments,public.live_sessions,public.attendance,public.certificates to authenticated;
 grant select,insert,update,delete on public.lesson_progress,public.attendance to authenticated;
 grant select,insert,update,delete on public.live_sessions to authenticated;
 grant select,insert,update,delete on public.platform_settings to authenticated;

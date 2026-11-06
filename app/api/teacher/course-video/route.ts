@@ -13,6 +13,6 @@ export async function POST(req:NextRequest){
   if(!course)return NextResponse.json({error:"Course not found."},{status:404});if(profile?.role!=="admin"&&!(profile?.role==="teacher"&&course.teacher_id===user.id))return NextResponse.json({error:"You do not have permission to upload videos to this course."},{status:403});
   const ext=file.type==="video/mp4"?"mp4":file.type==="video/webm"?"webm":"mov";const path=courseId+"/"+Date.now()+"-"+randomUUID()+"."+ext;
   const {error}=await db.storage.from("course-videos").upload(path,await file.arrayBuffer(),{contentType:file.type,upsert:false,cacheControl:"3600"});if(error)throw error;
-  const {data}=db.storage.from("course-videos").getPublicUrl(path);return NextResponse.json({url:data.publicUrl});
+  return NextResponse.json({url:"storage://course-videos/"+path});
  }catch{return NextResponse.json({error:"Video upload failed. Check course video storage configuration."},{status:500});}
 }

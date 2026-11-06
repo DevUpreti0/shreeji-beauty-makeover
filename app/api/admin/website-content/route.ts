@@ -9,7 +9,7 @@ export async function PUT(req:NextRequest){
  try{
   const b=await req.json();
   const pages=Array.isArray(b.pages)?b.pages.slice(0,30).map((p:any)=>({id:maxText(p.id,80),slug:maxText(p.slug,70).toLowerCase().replace(/[^a-z0-9-]/g,"-").replace(/^-|-$/g,""),title:maxText(p.title,120),description:maxText(p.description,500),body:maxText(p.body,12000),imageUrl:maxText(p.imageUrl,1000),published:p.published===true})).filter((p:any)=>p.slug&&p.title):[];
-  const sections=Array.isArray(b.customSections)?b.customSections.slice(0,20).map((s:any)=>({id:maxText(s.id,80),kind:["content","image","callout"].includes(s.kind)?s.kind:"content",title:maxText(s.title,160),body:maxText(s.body,3000),imageUrl:maxText(s.imageUrl,1000),ctaText:maxText(s.ctaText,80),ctaUrl:maxText(s.ctaUrl,500),visible:s.visible!==false})): [];
+  const sections=Array.isArray(b.customSections)?b.customSections.slice(0,20).map((s:any)=>({id:maxText(s.id,80),kind:["content","image","callout","faq","testimonials"].includes(s.kind)?s.kind:"content",title:maxText(s.title,160),body:maxText(s.body,3000),imageUrl:maxText(s.imageUrl,1000),ctaText:maxText(s.ctaText,80),ctaUrl:maxText(s.ctaUrl,500),visible:s.visible!==false})): [];
   const features=Array.isArray(b.features)?b.features.slice(0,8).map((f:any)=>({title:maxText(f.title,100),body:maxText(f.body,500)})):[];
   const navItems=Array.isArray(b.navItems)?b.navItems.slice(0,8).map((x:any)=>maxText(x,40)).filter(Boolean):["Home","Courses","About","Contact"];
   const value={

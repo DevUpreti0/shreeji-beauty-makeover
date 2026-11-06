@@ -13,7 +13,9 @@ export async function POST(req:NextRequest){
   if(courseError||!course||course.status!=="published")return NextResponse.json({error:"This course is not available for purchase."},{status:404});
   if(existing&&["active","paid","completed"].includes(existing.status))return NextResponse.json({error:"You are already enrolled in this course."},{status:409});
   if(!Number.isSafeInteger(course.price_paise)||course.price_paise<=0)return NextResponse.json({error:"Course price is not configured."},{status:400});
-  const {data:gatewaySetting}=await db.from("platform_settings").select("value").eq("key","payment_provider").maybeSingle();\n  if(gatewaySetting?.value!=="razorpay")return NextResponse.json({error:"Razorpay is not selected as the active payment provider. Ask the admin to enable it in Platform Settings."},{status:503});\n  const keyId=process.env.RAZORPAY_KEY_ID,secret=process.env.RAZORPAY_KEY_SECRET;
+  const {data:gatewaySetting}=await db.from("platform_settings").select("value").eq("key","payment_provider").maybeSingle();
+  if(gatewaySetting?.value!=="razorpay")return NextResponse.json({error:"Razorpay is not selected as the active payment provider. Ask the admin to enable it in Platform Settings."},{status:503});
+  const keyId=process.env.RAZORPAY_KEY_ID,secret=process.env.RAZORPAY_KEY_SECRET;
   if(!keyId||!secret)return NextResponse.json({error:"Razorpay is not connected yet. Admin must add the Razorpay API keys in Vercel."},{status:503});
   const response=await fetch("https://api.razorpay.com/v1/orders",{method:"POST",headers:{Authorization:"Basic "+Buffer.from(keyId+":"+secret).toString("base64"),"Content-Type":"application/json"},body:JSON.stringify({amount:course.price_paise,currency:"INR",receipt:"course_"+course.id.slice(0,8)+"_"+user.id.slice(0,8),notes:{course_id:course.id,student_id:user.id}}),cache:"no-store"});
   const order=await response.json();if(!response.ok||!order.id)return NextResponse.json({error:order.error?.description||"Razorpay could not create the order."},{status:502});

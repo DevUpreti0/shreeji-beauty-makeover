@@ -1,16 +1,44 @@
 import {redirect} from "next/navigation";
-import {revalidatePath} from "next/cache";
-import {randomUUID} from "node:crypto";
 import Link from "next/link";
 import {isAdminSessionValid,clearAdminSession} from "@/lib/admin-session";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
 export const dynamic="force-dynamic";
 async function logout(){ "use server"; await clearAdminSession(); redirect("/login"); }
-async function createCourse(formData:FormData){ "use server"; if(!await isAdminSessionValid())redirect("/login"); const title=String(formData.get("title")||"").trim();const category=String(formData.get("category")||"General").trim();const price=Number(formData.get("price"));if(!title||!Number.isSafeInteger(price)||price<0)throw new Error("Enter a valid title and price.");const slug=title.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+"-"+randomUUID().slice(0,8);const db=await createSupabaseServerClient();const {error}=await db.from("courses").insert({title,slug,category,price_paise:price*100,status:"draft"});if(error)throw new Error("Could not create course. Check database migration.");revalidatePath("/admin");}
-async function changeStatus(formData:FormData){ "use server";if(!await isAdminSessionValid())redirect("/login");const id=String(formData.get("id")||"");const status=String(formData.get("status")||"");if(!["draft","pending","published","archived"].includes(status))return;const db=await createSupabaseServerClient();await db.from("courses").update({status,published_at:status==="published"?new Date().toISOString():null}).eq("id",id);revalidatePath("/admin");}
+const sections=[
+ {href:"/admin/users",title:"Users & roles",desc:"View accounts, assign student/teacher/admin roles.",icon:"01"},
+ {href:"/admin/courses",title:"Course catalogue",desc:"Create courses, edit catalogue and publish or archive.",icon:"02"},
+ {href:"/admin/enrollments",title:"Enrollments",desc:"Review learner access and manage enrollment status.",icon:"03"},
+ {href:"/admin/payments",title:"Payments",desc:"Review payment records, amounts and payment states.",icon:"04"},
+ {href:"/admin/support",title:"Live support inbox",desc:"Read support conversations, reply and close tickets.",icon:"05"},
+ {href:"/admin/settings",title:"Platform settings",desc:"Configure payment mode, meeting provider and support contact.",icon:"06"},
+ {href:"/teacher",title:"Teacher workspace",desc:"Open teaching workspace and course authoring.",icon:"07"},
+ {href:"/",title:"View public website",desc:"Open the learner-facing Shreeji Beauty Makeover site.",icon:"08"}
+];
 export default async function AdminPage(){
  if(!await isAdminSessionValid())redirect("/login");
- let counts={users:0,courses:0,enrollments:0,payments:0};let courses:any[]=[];let users:any[]=[];let error="";
- try{const db=await createSupabaseServerClient();const [u,c,e,p,cr,us]=await Promise.all([db.from("profiles").select("*",{count:"exact",head:true}),db.from("courses").select("*",{count:"exact",head:true}),db.from("enrollments").select("*",{count:"exact",head:true}),db.from("payments").select("*",{count:"exact",head:true}),db.from("courses").select("id,title,category,status,price_paise").order("created_at",{ascending:false}).limit(20),db.from("profiles").select("id,full_name,role,created_at").order("created_at",{ascending:false}).limit(20)]);if(u.error||c.error||e.error||p.error||cr.error||us.error)throw new Error("Apply the LMS migration in Supabase first.");counts={users:u.count||0,courses:c.count||0,enrollments:e.count||0,payments:p.count||0};courses=cr.data||[];users=us.data||[];}catch(e){error=e instanceof Error?e.message:"Database setup pending.";}
- return <main className="portalPage"><header className="portalHeader"><Link href="/" className="brand">SHREEJI <b>ADMIN</b></Link><form action={logout}><button className="outline">Sign out</button></form></header><section className="portalContent"><div className="eyebrow">PLATFORM CONTROL CENTER</div><h1>Admin <em>dashboard.</em></h1><p>Signed in as dukubusiness. Database-backed platform administration.</p>{error&&<p className="formMessage">{error}</p>}<div className="portalMetrics"><div><small>REGISTERED USERS</small><strong>{counts.users}</strong></div><div><small>COURSES</small><strong>{counts.courses}</strong></div><div><small>ENROLLMENTS</small><strong>{counts.enrollments}</strong></div><div><small>PAYMENTS</small><strong>{counts.payments}</strong></div></div><div className="portalPanel"><h2>Manage platform</h2><div className="portalLinks"><Link href="/teacher">Teacher workspace ↗</Link></div></div><div className="portalPanel"><h2>Create a course</h2><form action={createCourse} style={{display:"flex",gap:10,flexWrap:"wrap"}}><input name="title" placeholder="Course title" required/><input name="category" placeholder="Category" defaultValue="Makeup"/><input name="price" type="number" min="0" placeholder="Price in INR" defaultValue="0" required/><button className="primary">Save draft course</button></form></div><div className="portalPanel"><h2>Courses</h2><div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse"}}><thead><tr><th align="left">Title</th><th align="left">Category</th><th align="left">Price</th><th align="left">Status</th><th align="left">Update</th></tr></thead><tbody>{courses.map(c=><tr key={c.id}><td style={{padding:10,borderTop:"1px solid #eee"}}>{c.title}</td><td style={{padding:10,borderTop:"1px solid #eee"}}>{c.category}</td><td style={{padding:10,borderTop:"1px solid #eee"}}>₹{(c.price_paise/100).toLocaleString("en-IN")}</td><td style={{padding:10,borderTop:"1px solid #eee"}}>{c.status}</td><td style={{padding:10,borderTop:"1px solid #eee"}}><form action={changeStatus}><input type="hidden" name="id" value={c.id}/><select name="status" defaultValue={c.status}><option value="draft">Draft</option><option value="pending">Pending</option><option value="published">Published</option><option value="archived">Archived</option></select><button className="outline">Save</button></form></td></tr>)}</tbody></table>{!courses.length&&!error&&<p>No courses created yet.</p>}</div></div><div className="portalPanel"><h2>Recent accounts</h2>{users.map(u=><p key={u.id} style={{borderBottom:"1px solid #eee",padding:"8px 0"}}>{u.full_name||"Learner"} · {u.role} · <small>{u.id}</small></p>)}</div></section></main>;
+ let counts={users:0,students:0,teachers:0,courses:0,published:0,enrollments:0,payments:0,support:0};
+ let recent:any[]=[];let error="";
+ try{
+  const db=await createSupabaseServerClient();
+  const [u,s,t,c,p,e,pa,sp,rc]=await Promise.all([
+   db.from("profiles").select("*",{count:"exact",head:true}),
+   db.from("profiles").select("*",{count:"exact",head:true}).eq("role","student"),
+   db.from("profiles").select("*",{count:"exact",head:true}).eq("role","teacher"),
+   db.from("courses").select("*",{count:"exact",head:true}),
+   db.from("courses").select("*",{count:"exact",head:true}).eq("status","published"),
+   db.from("enrollments").select("*",{count:"exact",head:true}),
+   db.from("payments").select("*",{count:"exact",head:true}),
+   db.from("support_conversations").select("*",{count:"exact",head:true}).eq("status","open"),
+   db.from("profiles").select("id,full_name,role,created_at").order("created_at",{ascending:false}).limit(6)
+  ]);
+  if(u.error||s.error||t.error||c.error||p.error||e.error||pa.error||sp.error||rc.error)throw new Error("Some dashboard data is unavailable. Check database policies and migrations.");
+  counts={users:u.count||0,students:s.count||0,teachers:t.count||0,courses:c.count||0,published:p.count||0,enrollments:e.count||0,payments:pa.count||0,support:sp.count||0};recent=rc.data||[];
+ }catch(err){error=err instanceof Error?err.message:"Dashboard data unavailable.";}
+ return <main className="portalPage"><header className="portalHeader"><Link href="/" className="brand">SHREEJI <b>ADMIN</b></Link><form action={logout}><button className="outline">Sign out</button></form></header><section className="portalContent">
+ <div className="eyebrow">OWNER CONTROL CENTER</div><h1>Platform <em>administration.</em></h1><p>Manage the learning platform from one place. Changes are protected by your admin account.</p>{error&&<p className="formMessage">{error}</p>}
+ <div className="portalMetrics">{[["TOTAL USERS",counts.users],["STUDENTS",counts.students],["TEACHERS",counts.teachers],["COURSES",counts.courses],["PUBLISHED",counts.published],["ENROLLMENTS",counts.enrollments],["PAYMENTS",counts.payments],["OPEN SUPPORT",counts.support]].map(([label,value])=><div key={String(label)}><small>{label}</small><strong>{value}</strong></div>)}</div>
+ <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:14,marginTop:26}}>{sections.map(s=><Link key={s.href} href={s.href} className="portalPanel" style={{textDecoration:"none",color:"inherit",display:"block",minHeight:135}}><small style={{color:"#9a7655",letterSpacing:2}}>{s.icon} / CONTROL</small><h2 style={{margin:"10px 0 6px"}}>{s.title} ↗</h2><p style={{margin:0,fontSize:14,opacity:.75}}>{s.desc}</p></Link>)}</div>
+ <div className="portalPanel" style={{marginTop:20}}><h2>Recently registered accounts</h2>{recent.map(u=><p key={u.id} style={{borderBottom:"1px solid #eee",padding:"8px 0",display:"flex",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}><span>{u.full_name||"Learner"} · {u.role}</span><small>{new Date(u.created_at).toLocaleDateString("en-IN")}</small></p>)}{!recent.length&&!error&&<p>No accounts found yet.</p>}<Link href="/admin/users">Open user directory →</Link></div>
+ <p style={{fontSize:12,opacity:.65,marginTop:20}}>Payment gateway checkout, automatic refunds, video hosting, certificate automation and third-party meeting integrations require provider setup before they can be activated.</p>
+ </section></main>;
 }

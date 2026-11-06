@@ -1,12 +1,20 @@
 # Project status
 
 ## Source committed
-The repository now contains a recreated Next.js 15 application foundation for Shreeji Beauty Makeover.
+The recreated Next.js 15 application foundation is committed to the main branch.
 
-Included: responsive public website, course catalogue and previews, demo student/teacher/admin dashboards, demo login/signup interface, and DuKu Meet lobby preview.
-
-## Not production-ready yet
-Authentication, database-backed roles, course uploads, payments, certificates, and live video meetings are not yet integrated. The UI explicitly labels demo areas. Provider credentials and secure backend implementation are required before real use.
+Included:
+- Responsive public website and course catalogue
+- Course search, filters and course preview
+- Demo student, teacher and admin dashboard screens
+- Demo login/signup interface with role selector
+- DuKu Meet lobby preview at /meeting
+- Setup instructions and production integration checklist
 
 ## Deployment
-Vercel project exists for this repository. Deployment is being attempted after the source commits.
+Vercel production deployment completed successfully.
+Public URL: https://shreeji-beauty-makeover.vercel.app
+Deployment build: READY.
+
+## Production integrations still required
+Authentication, database-backed roles, course uploads, payments, certificates, email delivery, and live video meetings are not yet integrated. Current login, dashboards and checkout are explicitly demo UI. Configure a secure backend and provider credentials before accepting real users or payments.

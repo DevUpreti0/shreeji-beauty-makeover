@@ -22,10 +22,10 @@ npm run dev
 2. Run `supabase/schema.sql` in the Supabase SQL Editor.
 3. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to Vercel.
 4. Add the server-only `SUPABASE_SERVICE_ROLE_KEY` only to Vercel (never commit it).
-5. Add `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `ADMIN_SESSION_SECRET` in Vercel Project Settings > Environment Variables. Set them for Production and Preview. Keep them encrypted/sensitive; do not add them to GitHub or any `NEXT_PUBLIC_*` variable.
+5. Add `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, and `ADMIN_SESSION_SECRET` in Vercel Project Settings > Environment Variables. Set them for Production and Preview. Keep them encrypted/sensitive; do not add them to GitHub or any `NEXT_PUBLIC_*` variable.
 6. Redeploy after adding environment variables.
 
-The admin ID configured for the initial account is `dukubusiness`. Set its password in Vercel as `ADMIN_PASSWORD`; it is intentionally not stored in this repository.
+The admin ID configured for the initial account is `dukubusiness`. Its password is checked using a salted scrypt hash stored in Vercel as `ADMIN_PASSWORD_HASH`; the plaintext is not stored in GitHub or Vercel.
 
 ## Important limitations
 Payments, secure video storage, certificates, email delivery and real-time meeting rooms still require provider setup and verified server-side integrations. Do not accept real payments until checkout, webhook signature verification and enrollment creation are implemented and tested.

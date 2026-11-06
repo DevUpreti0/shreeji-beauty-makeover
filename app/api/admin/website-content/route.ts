@@ -3,7 +3,8 @@ import {isAdminSessionValid} from "@/lib/admin-session";
 import {createAdminDb} from "@/lib/supabase/admin";
 import {revalidatePath} from "next/cache";
 export const runtime="nodejs";
-const maxText=(v:any,n:number)=>String(v??"").trim().slice(0,n);\nconst safeLink=(v:any)=>{const s=maxText(v,500);return /^(https?:\\/\\/|\\/|#|mailto:)/i.test(s)?s:"";};
+const maxText=(v:any,n:number)=>String(v??"").trim().slice(0,n);
+const safeLink=(v:any)=>{const s=maxText(v,500);return /^(https?:\/\/|\/|#|mailto:)/i.test(s)?s:"";};
 export async function PUT(req:NextRequest){
  if(!await isAdminSessionValid())return NextResponse.json({error:"Admin access required."},{status:401});
  try{

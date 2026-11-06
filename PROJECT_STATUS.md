@@ -1,20 +1,13 @@
 # Project status
 
-## Source committed
-The recreated Next.js 15 application foundation is committed to the main branch.
+## Backend source committed
+The repository now includes Supabase Auth client flows for student signup/login, a database migration with core LMS tables and row-level security, a protected server-side admin session, admin course management APIs, admin user directory and role assignment, platform settings, and teacher-owned draft course creation.
 
-Included:
-- Responsive public website and course catalogue
-- Course search, filters and course preview
-- Demo student, teacher and admin dashboard screens
-- Demo login/signup interface with role selector
-- DuKu Meet lobby preview at /meeting
-- Setup instructions and production integration checklist
+## Admin credentials
+The requested admin ID/password have been added to Vercel as encrypted server-side environment variables. They are not stored in the public repository or browser code. Admin login uses a signed HTTP-only cookie with an eight-hour expiry.
 
-## Deployment
-Vercel production deployment completed successfully.
-Public URL: https://shreeji-beauty-makeover.vercel.app
-Deployment build: READY.
+## Still awaiting Supabase project creation
+Supabase quoted the new project at $0/month, but its project-creation API requires explicit cost confirmation. After confirmation: create the Mumbai-region project, apply the migration, retrieve the project URL and publishable/service-role keys, add them to Vercel encrypted environment variables, redeploy, and test auth and admin data flows.
 
-## Production integrations still required
-Authentication, database-backed roles, course uploads, payments, certificates, email delivery, and live video meetings are not yet integrated. Current login, dashboards and checkout are explicitly demo UI. Configure a secure backend and provider credentials before accepting real users or payments.
+## Not yet integrated
+Payment gateway verification, secure video storage, certificates, email delivery and live meeting provider still require configuration and implementation.

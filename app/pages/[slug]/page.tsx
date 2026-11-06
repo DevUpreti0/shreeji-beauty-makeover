@@ -1,0 +1,9 @@
+import Link from "next/link";
+import {notFound} from "next/navigation";
+import {createSupabaseServerClient} from "@/lib/supabase-server";
+export const dynamic="force-dynamic";
+export default async function CustomPublicPage({params}:{params:Promise<{slug:string}>}){
+ const {slug}=await params;const db=await createSupabaseServerClient();const {data,error}=await db.from("platform_settings").select("value").eq("key","website_content").maybeSingle();
+ if(error||!data?.value)notFound();const page=(Array.isArray(data.value.pages)?data.value.pages:[]).find((p:any)=>p.slug===slug&&p.published);if(!page)notFound();
+ return <main style={{minHeight:"100vh",background:data.value.backgroundColor||"#faf7f2",color:data.value.textColor||"#332a26"}}><header style={{padding:"22px 7%",background:"#fff",borderBottom:"1px solid #eee",display:"flex",justifyContent:"space-between"}}><Link href="/" style={{color:"inherit",textDecoration:"none",fontWeight:700}}>{data.value.brandName||"SHREEJI BEAUTY MAKEOVER"}</Link><Link href="/" style={{color:data.value.primaryColor||"#a75e51"}}>Home ↗</Link></header><article style={{maxWidth:900,margin:"auto",padding:"70px 24px"}}><small style={{letterSpacing:3,color:data.value.primaryColor||"#a75e51"}}>SHREEJI BEAUTY MAKEOVER</small><h1 style={{fontSize:"clamp(36px,6vw,60px)",margin:"16px 0"}}>{page.title}</h1>{page.description&&<p style={{fontSize:18,lineHeight:1.8,opacity:.8}}>{page.description}</p>}{page.imageUrl&&<img src={page.imageUrl} alt={page.title} style={{width:"100%",maxHeight:460,objectFit:"cover",borderRadius:18,margin:"28px 0"}}/>}<div style={{fontSize:16,lineHeight:2,whiteSpace:"pre-wrap"}}>{page.body}</div></article><footer style={{padding:30,textAlign:"center",background:"#292522",color:"#fff"}}>{data.value.footerTagline||"Learn. Create. Shine."}</footer></main>;
+}

@@ -1,0 +1,24 @@
+import Link from "next/link";import {redirect} from "next/navigation";import {revalidatePath} from "next/cache";import {randomUUID} from "node:crypto";import {isAdminSessionValid} from "@/lib/admin-session";import {createAdminDb} from "@/lib/supabase/admin";import {createSupabaseServerClient} from "@/lib/supabase-server";
+export const dynamic="force-dynamic";
+async function schedule(formData:FormData){
+ "use server";if(!await isAdminSessionValid())redirect("/login");
+ const courseId=String(formData.get("course_id")||""),title=String(formData.get("title")||"").trim().slice(0,180),starts=String(formData.get("starts_at")||""),duration=Number(formData.get("duration_minutes")||60);
+ const date=new Date(starts);if(!courseId||title.length<3||!Number.isFinite(date.getTime())||date.getTime()<Date.now()-60000||!Number.isInteger(duration)||duration<10||duration>240)throw new Error("Enter a valid title, future date and duration.");
+ const auth=await createSupabaseServerClient();const {data:{user}}=await auth.auth.getUser();if(!user)redirect("/login");
+ const db=createAdminDb();const {data:course}=await db.from("courses").select("id").eq("id",courseId).maybeSingle();if(!course)throw new Error("Course not found.");
+ const {error}=await db.from("live_classes").insert({course_id:courseId,teacher_id:user.id,title,starts_at:date.toISOString(),duration_minutes:duration,room_name:"shreeji-"+randomUUID().replace(/-/g,"")});
+ if(error)throw new Error("Could not schedule class.");
+ revalidatePath("/admin/live-classes");revalidatePath("/live-classes");
+}
+async function changeStatus(formData:FormData){
+ "use server";if(!await isAdminSessionValid())redirect("/login");
+ const id=String(formData.get("id")||""),status=String(formData.get("status")||"");
+ if(!id||!["scheduled","live","completed","cancelled"].includes(status))return;
+ const {error}=await createAdminDb().from("live_classes").update({status}).eq("id",id);if(error)throw new Error("Could not update class.");
+ revalidatePath("/admin/live-classes");revalidatePath("/live-classes");
+}
+export default async function AdminLiveClasses(){
+ if(!await isAdminSessionValid())redirect("/login");const db=createAdminDb();
+ const [{data:courses},{data:classes,error}]=await Promise.all([db.from("courses").select("id,title").order("title"),db.from("live_classes").select("id,title,starts_at,duration_minutes,status,courses(title)").order("starts_at",{ascending:false}).limit(100)]);
+ return <main className="portalPage"><header className="portalHeader"><Link href="/admin" className="brand">← ADMIN DASHBOARD</Link></header><section className="portalContent"><div className="eyebrow">DUKU MEET PROFESSIONAL LMS</div><h1>Live class <em>management.</em></h1><p>Schedule course sessions, open meeting rooms and manage class status.</p><form action={schedule} className="portalPanel" style={{display:"grid",gap:12,maxWidth:720}}><h2>Schedule a class</h2><label>Course</label><select name="course_id" required defaultValue=""><option value="" disabled>Select course</option>{(courses||[]).map(c=><option key={c.id} value={c.id}>{c.title}</option>)}</select><label>Class title</label><input name="title" required minLength={3} maxLength={180} placeholder="e.g. Bridal base makeup — live Q&A"/><label>Start date and time</label><input name="starts_at" type="datetime-local" required/><label>Duration</label><select name="duration_minutes" defaultValue="60"><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option><option value="90">90 minutes</option><option value="120">120 minutes</option></select><button className="primary">Create Jitsi classroom</button><small>Each class gets a unique room name. Students must be enrolled in the linked course to join.</small></form>{error&&<p className="formMessage">Could not load live classes.</p>}<div style={{display:"grid",gap:12,marginTop:22}}>{(classes||[]).map(c=><article className="portalPanel" key={c.id}><small>{c.status.toUpperCase()} · {new Date(c.starts_at).toLocaleString("en-IN")}</small><h2>{c.title}</h2><p>{(c as any).courses?.title} · {c.duration_minutes} minutes</p><div style={{display:"flex",gap:10,flexWrap:"wrap"}}><Link className="primary inlineButton" href={"/live-classes/"+c.id}>Open room ↗</Link><form action={changeStatus} style={{display:"flex",gap:8}}><input type="hidden" name="id" value={c.id}/><select name="status" defaultValue={c.status}><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><button className="outline">Update</button></form></div></article>)}</div></section></main>;
+}

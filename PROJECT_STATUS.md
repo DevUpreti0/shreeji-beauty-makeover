@@ -16,7 +16,7 @@ The Vercel project has encrypted environment values configured for the Supabase 
 Register a Supabase Auth account using the configured `ADMIN_LOGIN_EMAIL` (the account email configured for the owner), confirm the email, and then promote its profile to `admin` using the SQL in the README. Admin login uses the configured ID `dukubusiness` and that account's password. The account must be registered and promoted before admin sign-in can work.
 
 ## Application deployment
-The first Vercel deployment completed successfully, but it predates the latest Auth/RLS changes. A new deployment is required to publish the current source and environment values.
+The first Vercel deployment completed successfully, but it predates the latest Auth/RLS changes. Latest production deployment is READY at https://shreeji-beauty-makeover.vercel.app. It includes the Supabase-connected student auth, protected admin login flow, student/teacher dashboards and teacher course-draft API. The GitHub repository also contains additional admin pages and settings APIs not yet included in this deployment.
 
 ## Not yet integrated
 Payment gateway verification, secure video storage, certificate issuance, email delivery and live meeting provider still require provider configuration and implementation. Do not represent these integrations as active until tested.

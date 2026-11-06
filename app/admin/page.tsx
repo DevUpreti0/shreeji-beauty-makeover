@@ -11,8 +11,9 @@ const sections=[
  {href:"/admin/payments",title:"Payments",desc:"Review payment records, amounts and payment states.",icon:"04"},
  {href:"/admin/support",title:"Live support inbox",desc:"Read support conversations, reply and close tickets.",icon:"05"},
  {href:"/admin/settings",title:"Platform settings",desc:"Configure payment mode, meeting provider and support contact.",icon:"06"},
- {href:"/teacher",title:"Teacher workspace",desc:"Open teaching workspace and course authoring.",icon:"07"},
- {href:"/",title:"View public website",desc:"Open the learner-facing Shreeji Beauty Makeover site.",icon:"08"}
+ {href:"/admin/website",title:"Website content editor",desc:"Edit homepage hero, announcement, course heading and contact email.",icon:"07"},
+ {href:"/teacher",title:"Teacher workspace",desc:"Open teaching workspace and course authoring.",icon:"08"},
+ {href:"/",title:"View public website",desc:"Open the learner-facing Shreeji Beauty Makeover site.",icon:"09"}
 ];
 export default async function AdminPage(){
  if(!await isAdminSessionValid())redirect("/login");

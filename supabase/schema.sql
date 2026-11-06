@@ -13,10 +13,12 @@ create table if not exists public.courses (
  teacher_id uuid references public.profiles(id) on delete set null,
  title text not null,
  slug text unique not null,
+ category text not null default 'General',
  description text,
  thumbnail_url text,
  price_inr integer not null default 0 check(price_inr>=0),
- status text not null default 'draft' check(status in ('draft','published','archived')),
+ price_paise bigint not null default 0 check(price_paise>=0),
+ status text not null default 'draft' check(status in ('draft','pending','published','archived')),
  created_at timestamptz not null default now(),
  updated_at timestamptz not null default now()
 );
@@ -142,3 +144,9 @@ grant select on public.enrollments,public.lesson_progress,public.payments,public
 grant insert,update,delete on public.modules,public.lessons to authenticated;
 grant insert,update,delete on public.courses to authenticated;
 grant insert,update,delete on public.lesson_progress to authenticated;
+
+-- Compatibility additions for existing deployments; safe to run more than once.
+alter table public.courses add column if not exists category text not null default 'General';
+alter table public.courses add column if not exists price_paise bigint not null default 0 check(price_paise>=0);
+alter table public.courses drop constraint if exists courses_status_check;
+alter table public.courses add constraint courses_status_check check(status in ('draft','pending','published','archived'));

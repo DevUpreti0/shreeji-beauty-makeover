@@ -30,6 +30,7 @@ export async function PATCH(req:NextRequest){
 export async function DELETE(req:NextRequest){
  const identity=await owner();if(!identity)return NextResponse.json({error:"Super admin access required."},{status:403});
  const id=clean(req.nextUrl.searchParams.get("id"),80);if(!id)return NextResponse.json({error:"Entry ID is required."},{status:400});
- const {error}=await createAdminDb().from("duku_ai_knowledge_base").delete().eq("id",id);if(error)return NextResponse.json({error:"Could not delete this entry."},{status:500});
+ const db=createAdminDb();const {data:entry}=await db.from("duku_ai_knowledge_base").select("category,question").eq("id",id).maybeSingle();const {error}=await db.from("duku_ai_knowledge_base").delete().eq("id",id);if(error)return NextResponse.json({error:"Could not delete this entry."},{status:500});
+ await db.from("admin_access_audit").insert({actor_id:identity.user.id,target_admin_id:identity.user.id,action:"delete_duku_ai_knowledge",details:{entry_id:id,category:entry?.category,question:entry?.question}});
  return NextResponse.json({ok:true});
 }

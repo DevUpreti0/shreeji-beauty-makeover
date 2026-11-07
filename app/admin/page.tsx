@@ -7,6 +7,7 @@ async function logout(){ "use server"; await clearAdminSession(); redirect("/log
 const sections=[
  {href:"/admin/users",title:"Users & roles",desc:"View accounts, assign student/teacher/admin roles.",icon:"01"},
  {href:"/admin/courses",title:"Course catalogue",desc:"Create courses, edit catalogue and publish or archive.",icon:"02"},
+ {href:"/admin/assessments",title:"Quizzes & assessments",desc:"Build course assessments and review learner attempts.",icon:"02A"},
  {href:"/admin/enrollments",title:"Enrollments",desc:"Review learner access and manage enrollment status.",icon:"03"},
  {href:"/admin/payments",title:"Payments",desc:"Review payment records, amounts and payment states.",icon:"04"},
  {href:"/admin/live-classes",title:"Live classes",desc:"Schedule and host DuKu Meet classrooms, manage sessions and review attendance.",icon:"05"},

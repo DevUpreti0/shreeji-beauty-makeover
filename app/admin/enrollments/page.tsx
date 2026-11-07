@@ -1,10 +1,10 @@
 import Link from "next/link";
 import {redirect} from "next/navigation";
-import {isAdminSessionValid} from "@/lib/admin-session";
+import {canAdminAccess} from "@/lib/admin-session";
 import {createAdminDb} from "@/lib/supabase/admin";
 export const dynamic="force-dynamic";
 export default async function EnrollmentsPage(){
- if(!await isAdminSessionValid())redirect("/login");
+ if(!await canAdminAccess("enrollments"))redirect("/admin");
  const db=createAdminDb();const {data:items,error}=await db.from("enrollments").select("id,student_id,course_id,status,enrolled_at").order("enrolled_at",{ascending:false}).limit(250);
  const rows=items||[];const studentIds=[...new Set(rows.map(x=>x.student_id))],courseIds=[...new Set(rows.map(x=>x.course_id))];
  const [{data:students},{data:courses}]=await Promise.all([studentIds.length?db.from("profiles").select("id,full_name").in("id",studentIds):Promise.resolve({data:[] as any[]}),courseIds.length?db.from("courses").select("id,title").in("id",courseIds):Promise.resolve({data:[] as any[]})]);

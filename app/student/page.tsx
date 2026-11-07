@@ -39,6 +39,9 @@ export default async function StudentPage() {
   const totalCompleted = courseStats.reduce((sum:any,c:any) => sum + c.completed,0);
   const overall = totalLessons ? Math.round(totalCompleted / totalLessons * 100) : 0;
   const activeCount = courseStats.filter((c:any) => ["active","paid"].includes(c.status)).length;
+  const {data:upcomingClasses} = courseIds.length
+    ? await sb.from("live_classes").select("id,title,starts_at,duration_minutes,status,courses(title)").in("course_id",courseIds).in("status",["scheduled","live"]).gte("starts_at",new Date(Date.now()-3*60*60*1000).toISOString()).order("starts_at",{ascending:true}).limit(8)
+    : {data:[] as any[]};
 
   return <main className="portalPage">
     <header className="portalHeader">
@@ -71,6 +74,19 @@ export default async function StudentPage() {
           <div style={{height:"100%",width:overall+"%",background:"linear-gradient(90deg,#b98a61,#e3c39b)",borderRadius:20,transition:"width .4s"}} />
         </div>
       </div>
+
+      <section className="portalPanel" style={{marginBottom:22}}>
+        <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+          <div><div className="eyebrow" style={{marginBottom:8}}>DUKU MEET CLASS SCHEDULE</div><h2 style={{margin:0}}>Upcoming live classes</h2><p style={{margin:"6px 0 0"}}>Your course sessions, all in one place.</p></div>
+          <Link className="outline" href="/live-classes">All classrooms ↗</Link>
+        </div>
+        {upcomingClasses?.length ? <div style={{display:"grid",gap:10,marginTop:16}}>
+          {upcomingClasses.map((c:any) => <article className="portalCourse" key={c.id}>
+            <div style={{flex:1,minWidth:180}}><b>{c.title}</b><span>{c.courses?.title || "Your course"} · {new Date(c.starts_at).toLocaleString("en-IN")} · {c.duration_minutes} min</span><small style={{display:"inline-block",marginTop:6,color:c.status==="live"?"#8df0bf":"#c8bbff",letterSpacing:1}}>{c.status==="live"?"● LIVE NOW":"SCHEDULED"}</small></div>
+            <Link className="primary inlineButton" href={"/live-classes/"+c.id}>{c.status==="live"?"Join live class ↗":"Open class details ↗"}</Link>
+          </article>)}
+        </div> : <div style={{padding:"18px 0 4px"}}><p>No upcoming sessions yet. New classes scheduled for your enrolled courses will appear here.</p></div>}
+      </section>
 
       <div className="portalPanel">
         <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}>

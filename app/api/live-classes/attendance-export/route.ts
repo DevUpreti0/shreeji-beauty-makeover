@@ -17,8 +17,8 @@ export async function GET(){
  const [{data:people},{data:courses}]=await Promise.all([userIds.length?db.from("profiles").select("id,full_name,role").in("id",userIds):Promise.resolve({data:[] as any[]}),courseIds.length?db.from("courses").select("id,title").in("id",courseIds):Promise.resolve({data:[] as any[]})]);
  const names=new Map((people||[]).map(p=>[p.id,p.full_name||"Learner"])),roles=new Map((people||[]).map(p=>[p.id,p.role||"student"])),courseNames=new Map((courses||[]).map(c=>[c.id,c.title]));
  const byId=new Map((classes||[]).map(c=>[c.id,c]));
- const rows=[["Class","Course","Student","Role","Joined (UTC)","Left (UTC)","Attendance status","Last signal (UTC)"]];
- for(const a of attendance||[]){const c=byId.get(a.live_class_id);rows.push([c?.title||"Class",courseNames.get(c?.course_id)||"Course",names.get(a.user_id)||"Learner",roles.get(a.user_id)||"student",a.joined_at,a.left_at||"",a.left_at?"Left":a.last_seen_at&&Date.now()-new Date(a.last_seen_at).getTime()<90000?"Online now":"Session open / signal unavailable",a.last_seen_at||""]);}
+ const rows=[["Class","Course","Student","Role","Joined (UTC)","Left (UTC)","Attendance status","Time in class (approx. minutes)","Last signal (UTC)"]];
+ for(const a of attendance||[]){const c=byId.get(a.live_class_id);rows.push([c?.title||"Class",courseNames.get(c?.course_id)||"Course",names.get(a.user_id)||"Learner",roles.get(a.user_id)||"student",a.joined_at,a.left_at||"",a.left_at?"Left":a.last_seen_at&&Date.now()-new Date(a.last_seen_at).getTime()<90000?"Online now":"Session open / signal unavailable",a.left_at||a.last_seen_at?Math.max(0,Math.round((new Date(a.left_at||a.last_seen_at).getTime()-new Date(a.joined_at).getTime())/60000)):"",a.last_seen_at||""]);}
  const csv="\uFEFF"+rows.map(row=>row.map(cell).join(",")).join("\r\n");
  return new NextResponse(csv,{headers:{"Content-Type":"text/csv; charset=utf-8","Content-Disposition":'attachment; filename="duku-meet-attendance.csv"',"Cache-Control":"no-store"}});
 }

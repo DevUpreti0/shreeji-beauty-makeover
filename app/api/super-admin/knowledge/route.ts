@@ -16,7 +16,7 @@ export async function POST(req:NextRequest){
  try{const body=await req.json();if(!valid(body))return NextResponse.json({error:"Add a category, a question and an answer."},{status:400});
  const keywords=Array.isArray(body.keywords)?body.keywords.map((x:unknown)=>clean(x,50).toLowerCase()).filter(Boolean).slice(0,20):[];
  const {data,error}=await createAdminDb().from("duku_ai_knowledge_base").insert({category:clean(body.category,80),question:clean(body.question,240),answer:clean(body.answer,5000),keywords,is_published:!!body.is_published,sort_order:Number.isFinite(Number(body.sort_order))?Math.max(-10000,Math.min(10000,Number(body.sort_order))):0,created_by:identity.user.id,updated_by:identity.user.id}).select("*").single();
- if(error)throw error;return NextResponse.json({entry:data});
+ if(error)throw error;await createAdminDb().from("admin_access_audit").insert({actor_id:identity.user.id,target_admin_id:identity.user.id,action:"create_duku_ai_knowledge",details:{entry_id:data.id,category:data.category,is_published:data.is_published}});return NextResponse.json({entry:data});
  }catch{return NextResponse.json({error:"Could not save this knowledge entry."},{status:500});}
 }
 export async function PATCH(req:NextRequest){
@@ -24,7 +24,7 @@ export async function PATCH(req:NextRequest){
  try{const body=await req.json(),id=clean(body.id,80);if(!id||!valid(body))return NextResponse.json({error:"Check the entry details."},{status:400});
  const keywords=Array.isArray(body.keywords)?body.keywords.map((x:unknown)=>clean(x,50).toLowerCase()).filter(Boolean).slice(0,20):[];
  const {data,error}=await createAdminDb().from("duku_ai_knowledge_base").update({category:clean(body.category,80),question:clean(body.question,240),answer:clean(body.answer,5000),keywords,is_published:!!body.is_published,sort_order:Number.isFinite(Number(body.sort_order))?Math.max(-10000,Math.min(10000,Number(body.sort_order))):0,updated_by:identity.user.id,updated_at:new Date().toISOString()}).eq("id",id).select("*").single();
- if(error||!data)throw error||new Error("Not found");return NextResponse.json({entry:data});
+ if(error||!data)throw error||new Error("Not found");await createAdminDb().from("admin_access_audit").insert({actor_id:identity.user.id,target_admin_id:identity.user.id,action:"update_duku_ai_knowledge",details:{entry_id:data.id,category:data.category,is_published:data.is_published}});return NextResponse.json({entry:data});
  }catch{return NextResponse.json({error:"Could not update this knowledge entry."},{status:500});}
 }
 export async function DELETE(req:NextRequest){

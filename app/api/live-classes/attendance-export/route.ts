@@ -12,13 +12,13 @@ export async function GET(){
  const db=createAdminDb();let query=db.from("live_classes").select("id,title,starts_at,teacher_id,course_id").order("starts_at",{ascending:false}).limit(200);
  if(profile.role==="teacher")query=query.eq("teacher_id",user.id);
  const {data:classes,error}=await query;if(error)return NextResponse.json({error:"Could not load classes."},{status:500});
- const classIds=(classes||[]).map(c=>c.id);const {data:attendance}=classIds.length?await db.from("live_class_attendance").select("live_class_id,user_id,joined_at,left_at").in("live_class_id",classIds).order("joined_at",{ascending:false}):{data:[] as any[]};
+ const classIds=(classes||[]).map(c=>c.id);const {data:attendance}=classIds.length?await db.from("live_class_attendance").select("live_class_id,user_id,joined_at,left_at,last_seen_at").in("live_class_id",classIds).order("joined_at",{ascending:false}):{data:[] as any[]};
  const userIds=[...new Set((attendance||[]).map(a=>a.user_id))];const courseIds=[...new Set((classes||[]).map(c=>c.course_id))];
  const [{data:people},{data:courses}]=await Promise.all([userIds.length?db.from("profiles").select("id,full_name,role").in("id",userIds):Promise.resolve({data:[] as any[]}),courseIds.length?db.from("courses").select("id,title").in("id",courseIds):Promise.resolve({data:[] as any[]})]);
  const names=new Map((people||[]).map(p=>[p.id,p.full_name||"Learner"])),roles=new Map((people||[]).map(p=>[p.id,p.role||"student"])),courseNames=new Map((courses||[]).map(c=>[c.id,c.title]));
  const byId=new Map((classes||[]).map(c=>[c.id,c]));
- const rows=[["Class","Course","Student","Role","Joined (UTC)","Left (UTC)","Attendance status"]];
- for(const a of attendance||[]){const c=byId.get(a.live_class_id);rows.push([c?.title||"Class",courseNames.get(c?.course_id)||"Course",names.get(a.user_id)||"Learner",roles.get(a.user_id)||"student",a.joined_at,a.left_at||"",a.left_at?"Left":"Joined / active"]);}
+ const rows=[["Class","Course","Student","Role","Joined (UTC)","Left (UTC)","Attendance status","Last signal (UTC)"]];
+ for(const a of attendance||[]){const c=byId.get(a.live_class_id);rows.push([c?.title||"Class",courseNames.get(c?.course_id)||"Course",names.get(a.user_id)||"Learner",roles.get(a.user_id)||"student",a.joined_at,a.left_at||"",a.left_at?"Left":a.last_seen_at&&Date.now()-new Date(a.last_seen_at).getTime()<90000?"Online now":"Session open / signal unavailable",a.last_seen_at||""]);}
  const csv="\uFEFF"+rows.map(row=>row.map(cell).join(",")).join("\r\n");
  return new NextResponse(csv,{headers:{"Content-Type":"text/csv; charset=utf-8","Content-Disposition":'attachment; filename="duku-meet-attendance.csv"',"Cache-Control":"no-store"}});
 }

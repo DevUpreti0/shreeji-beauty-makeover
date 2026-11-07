@@ -10,7 +10,7 @@ export default function CheckoutClient({course,email,name,provider,initialPhone}
   if(provider==="cashfree"){
    const r=await fetch("/api/payments/cashfree/order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({courseId:course.id,couponCode:coupon?.code||null,phone})});const j=await r.json();if(!r.ok)throw new Error(j.error||"Cashfree order failed.");
    if(!(window as any).Cashfree){await new Promise<void>((resolve,reject)=>{const s=document.createElement("script");s.src="https://sdk.cashfree.com/js/v3/cashfree.js";s.onload=()=>resolve();s.onerror=()=>reject(new Error("Cashfree checkout SDK could not load."));document.body.appendChild(s);});}
-   const cashfree=(window as any).Cashfree({mode:"production"});await cashfree.checkout({paymentSessionId:j.paymentSessionId,redirectTarget:"_self"});return;
+   const cashfree=(window as any).Cashfree({mode:j.mode==="production"?"production":"sandbox"});await cashfree.checkout({paymentSessionId:j.paymentSessionId,redirectTarget:"_self"});return;
   }
   const r=await fetch("/api/payments/razorpay/order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({courseId:course.id,couponCode:coupon?.code||null})});const order=await r.json();if(!r.ok)throw new Error(order.error||"Could not start payment.");
   if(!(window as any).Razorpay){await new Promise<void>((resolve,reject)=>{const s=document.createElement("script");s.src="https://checkout.razorpay.com/v1/checkout.js";s.onload=()=>resolve();s.onerror=()=>reject(new Error("Payment checkout could not load."));document.body.appendChild(s);});}

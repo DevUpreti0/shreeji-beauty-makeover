@@ -2,6 +2,7 @@ import Link from "next/link";
 import {redirect} from "next/navigation";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
 import TeacherPanel from "./teacher-panel";
+import TeacherToolkit from "./teacher-toolkit";
 
 export const dynamic = "force-dynamic";
 
@@ -79,6 +80,8 @@ export default async function TeacherPage() {
           <small style={{display:"block",marginTop:8,color:"#b9c5da"}}>Calculated from lesson progress records visible to your teacher account.</small>
         </div>
       </section>
+
+      <TeacherToolkit />
 
       <section className="portalPanel" style={{marginBottom:20}}>
         <div className="eyebrow" style={{marginBottom:8}}>DUKU MEET PLANNER</div>

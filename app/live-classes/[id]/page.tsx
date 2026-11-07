@@ -4,6 +4,7 @@ import {createSupabaseServerClient} from "@/lib/supabase-server";
 import {createAdminDb} from "@/lib/supabase/admin";
 import MeetingRoom from "./meeting-room";
 import {formatIndiaDateTime} from "@/lib/datetime";
+import {canAdminAccess} from "@/lib/admin-session";
 export const dynamic="force-dynamic";
 
 export default async function LiveClassPage({params}:{params:Promise<{id:string}>}){
@@ -11,9 +12,10 @@ export default async function LiveClassPage({params}:{params:Promise<{id:string}
  const {data:profile}=await db.from("profiles").select("full_name,role,avatar_url").eq("id",user.id).single();
  const {data:c}=await db.from("live_classes").select("id,title,starts_at,duration_minutes,status,course_id,teacher_id,room_name,courses(title)").eq("id",id).maybeSingle();if(!c)notFound();
  const adminDb=createAdminDb();
- const allowed=profile?.role==="admin"||c.teacher_id===user.id||!!(await adminDb.from("enrollments").select("id").eq("student_id",user.id).eq("course_id",c.course_id).in("status",["active","paid","completed"]).maybeSingle()).data;
+ const adminCanHost=profile?.role==="admin"&&await canAdminAccess("live-classes");
+ const allowed=adminCanHost||c.teacher_id===user.id||!!(await adminDb.from("enrollments").select("id").eq("student_id",user.id).eq("course_id",c.course_id).in("status",["active","paid","completed"]).maybeSingle()).data;
  if(!allowed)redirect("/student");
- const start=new Date(c.starts_at).getTime(),now=Date.now(),end=start+c.duration_minutes*60000;const isStaff=profile?.role==="admin"||c.teacher_id===user.id;const withinWindow=c.status==="live"||(now>=start-15*60000&&now<=end+30*60000);const unavailable=["cancelled","completed"].includes(c.status);
+ const start=new Date(c.starts_at).getTime(),now=Date.now(),end=start+c.duration_minutes*60000;const isStaff=adminCanHost||c.teacher_id===user.id;const withinWindow=c.status==="live"||(now>=start-15*60000&&now<=end+30*60000);const unavailable=["cancelled","completed"].includes(c.status);
  let participants:{id:string;name:string;email:string;avatar:string|null;role:string}[]=[];
  try{
   const {data:enrollments}=await adminDb.from("enrollments").select("student_id").eq("course_id",c.course_id).in("status",["active","paid","completed"]);

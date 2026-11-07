@@ -1,10 +1,10 @@
 import {NextRequest,NextResponse} from "next/server";
 import {randomUUID} from "node:crypto";
-import {isAdminSessionValid} from "@/lib/admin-session";
+import {canAdminAccess} from "@/lib/admin-session";
 import {createAdminDb} from "@/lib/supabase/admin";
 export const runtime="nodejs";
 export async function POST(req:NextRequest){
- if(!await isAdminSessionValid())return NextResponse.json({error:"Admin access required."},{status:401});
+ if(!await canAdminAccess("website"))return NextResponse.json({error:"Admin access required."},{status:401});
  try{
   const form=await req.formData();const file=form.get("file");if(!(file instanceof File))return NextResponse.json({error:"Choose an image file."},{status:400});
   const allowed=["image/jpeg","image/png","image/webp","image/gif"];if(!allowed.includes(file.type))return NextResponse.json({error:"Only JPG, PNG, WEBP and GIF images are supported."},{status:415});

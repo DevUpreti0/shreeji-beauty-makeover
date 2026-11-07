@@ -1,11 +1,11 @@
 import Link from "next/link";
 import {redirect} from "next/navigation";
-import {isAdminSessionValid} from "@/lib/admin-session";
+import {canAdminAccess} from "@/lib/admin-session";
 import {createAdminDb} from "@/lib/supabase/admin";
 import PaymentsTable from "./payments-table";
 export const dynamic="force-dynamic";
 export default async function PaymentsPage(){
- if(!await isAdminSessionValid())redirect("/login");
+ if(!await canAdminAccess("payments"))redirect("/admin");
  const db=createAdminDb();
  const {data:payments,error}=await db.from("payments").select("id,student_id,course_id,provider,provider_order_id,amount_paise,currency,status,created_at,paid_at").order("created_at",{ascending:false}).limit(200);
  const rows=payments||[];

@@ -48,8 +48,9 @@ export default async function StudentPage() {
     {label:"Halfway there",detail:"Complete at least half of your lessons",unlocked:overall>=50},
     {label:"Course finisher",detail:"Finish all lessons in a course",unlocked:completedCourses>=1},
   ];
-  const {data:upcomingClasses} = courseIds.length
-    ? await sb.from("live_classes").select("id,title,starts_at,duration_minutes,status,courses(title)").in("course_id",courseIds).in("status",["scheduled","live"]).gte("starts_at",new Date(Date.now()-3*60*60*1000).toISOString()).order("starts_at",{ascending:true}).limit(8)
+  const activeCourseIds = courseStats.filter((c:any) => ["active","paid","completed"].includes(c.status)).map((c:any) => c.course.id);
+  const {data:upcomingClasses} = activeCourseIds.length
+    ? await sb.from("live_classes").select("id,title,starts_at,duration_minutes,status,courses(title)").in("course_id",activeCourseIds).in("status",["scheduled","live"]).gte("starts_at",new Date(Date.now()-3*60*60*1000).toISOString()).order("starts_at",{ascending:true}).limit(8)
     : {data:[] as any[]};
 
   return <main className="portalPage">

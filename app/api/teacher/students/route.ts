@@ -3,6 +3,7 @@ import {createSupabaseServerClient} from "@/lib/supabase-server";
 import {createAdminDb} from "@/lib/supabase/admin";
 
 export const dynamic="force-dynamic";
+const latest=(values:string[])=>values.sort().slice(-1)[0]||null;
 export async function GET(){
  try{
   const auth=await createSupabaseServerClient();
@@ -50,8 +51,8 @@ export async function GET(){
     return {id:e.course_id,title:(courseById.get(e.course_id) as any)?.title||"Course",status:e.status,enrolledAt:e.enrolled_at,totalLessons:ids.length,completedLessons:completed,progressPercent:ids.length?Math.round(completed/ids.length*100):0};
    });
    const attended=(attendance||[]).filter((a:any)=>a.user_id===p.id);
-   const lastActivity=(progress||[]).filter((x:any)=>x.student_id===p.id).map((x:any)=>x.updated_at).sort().at(-1)||null;
-   return {id:p.id,name:p.full_name||"Student",email:emails.get(p.id)||"",avatarUrl:p.avatar_url||"",phone:p.phone||"",city:p.city||"",joinedAt:p.created_at,courses:courseRows,attendanceCount:attended.length,lastAttendance:attended.map((a:any)=>a.joined_at).sort().at(-1)||null,lastActivity};
+   const lastActivity=latest((progress||[]).filter((x:any)=>x.student_id===p.id).map((x:any)=>x.updated_at));
+   return {id:p.id,name:p.full_name||"Student",email:emails.get(p.id)||"",avatarUrl:p.avatar_url||"",phone:p.phone||"",city:p.city||"",joinedAt:p.created_at,courses:courseRows,attendanceCount:attended.length,lastAttendance:latest(attended.map((a:any)=>a.joined_at)),lastActivity};
   }).sort((a:any,b:any)=>a.name.localeCompare(b.name));
   return NextResponse.json({students,courses});
  }catch(error){console.error("Teacher student directory error",error);return NextResponse.json({error:"Student records could not be loaded."},{status:500});}

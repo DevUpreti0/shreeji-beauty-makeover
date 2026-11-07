@@ -6,7 +6,7 @@ export default function MeetingRoom({roomName,displayName,classId}:{roomName:str
  const target=useRef<HTMLDivElement>(null),apiRef=useRef<MeetingApi|null>(null),joinedAt=useRef<number|null>(null);
  const [connection,setConnection]=useState("Preparing your classroom…"),[joined,setJoined]=useState(false),[participants,setParticipants]=useState(0),[audioMuted,setAudioMuted]=useState(true),[videoMuted,setVideoMuted]=useState(true),[elapsed,setElapsed]=useState(0),[attempt,setAttempt]=useState(0),[loadError,setLoadError]=useState("");
  const command=(name:string)=>apiRef.current?.executeCommand?.(name);
- const domain=(process.env.NEXT_PUBLIC_JITSI_DOMAIN||"meet.jit.si").replace(/^https?:\\/\\//,"").replace(/\\/$/,"");
+ const domain=(process.env.NEXT_PUBLIC_JITSI_DOMAIN||"meet.jit.si").replace("https://","").replace("http://","").replaceAll("/","");
  useEffect(()=>{
   let api:MeetingApi|undefined,disposed=false,hasJoined=false,script:HTMLScriptElement|null=null;
   const record=async(event:"joined"|"left")=>{try{await fetch("/api/live-classes/"+encodeURIComponent(classId)+"/attendance",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({event}),keepalive:event==="left"});}catch{}};

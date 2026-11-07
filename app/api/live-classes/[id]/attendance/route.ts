@@ -1,6 +1,7 @@
 import {NextRequest,NextResponse} from "next/server";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
 import {createAdminDb} from "@/lib/supabase/admin";
+import {canAdminAccess} from "@/lib/admin-session";
 export const runtime="nodejs";
 export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>}){
  try{
@@ -8,7 +9,7 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
   const {event}=await req.json();if(event!=="joined"&&event!=="left"&&event!=="heartbeat")return NextResponse.json({error:"Invalid attendance event."},{status:400});
   const db=createAdminDb();const {data:c}=await db.from("live_classes").select("id,course_id,teacher_id,status,starts_at,duration_minutes").eq("id",id).maybeSingle();if(!c)return NextResponse.json({error:"Class not found."},{status:404});
   const {data:p}=await auth.from("profiles").select("role").eq("id",user.id).maybeSingle();
-  const isAdmin=p?.role==="admin",isTeacher=c.teacher_id===user.id;
+  const isAdmin=p?.role==="admin"&&await canAdminAccess("live-classes"),isTeacher=c.teacher_id===user.id;
   const {data:enrollment}=!isAdmin&&!isTeacher?await db.from("enrollments").select("id").eq("student_id",user.id).eq("course_id",c.course_id).in("status",["active","paid","completed"]).maybeSingle():{data:null};
   if(!isAdmin&&!isTeacher&&!enrollment)return NextResponse.json({error:"You are not enrolled in this course."},{status:403});
   if(event==="joined"){

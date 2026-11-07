@@ -10,6 +10,7 @@ const sections=[
  {href:"/admin/super-admin/audit",title:"Admin access audit log",desc:"Review administrator appointments, removals and section permission changes.",icon:"AUDIT"},
  {href:"/admin/courses",title:"Course catalogue",desc:"Create courses, edit catalogue and publish or archive.",icon:"02"},
  {href:"/admin/assessments",title:"Quizzes & assessments",desc:"Build course assessments and review learner attempts.",icon:"02A"},
+ {href:"/admin/assignments",title:"Assignment oversight",desc:"Monitor teacher assignments, learner submissions and pending grading.",icon:"02B"},
  {href:"/admin/enrollments",title:"Enrollments",desc:"Review learner access and manage enrollment status.",icon:"03"},
  {href:"/admin/payments",title:"Payments",desc:"Review payment records, amounts and payment states.",icon:"04"},
  {href:"/admin/coupons",title:"Coupons & discounts",desc:"Generate free-course codes, percentage offers and fixed discounts.",icon:"04A"},

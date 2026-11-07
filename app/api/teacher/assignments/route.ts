@@ -26,9 +26,12 @@ export async function PATCH(req:NextRequest){
   if(profile.role==="admin"&&!await canAdminAccess("courses",true))return NextResponse.json({error:"You do not have edit access to courses."},{status:403});
   const body=await req.json();const submissionId=String(body.submissionId||"");const grade=Number(body.grade);const feedback=String(body.feedback||"").trim();
   if(!submissionId||!Number.isInteger(grade)||grade<0||grade>1000||feedback.length>4000)return NextResponse.json({error:"Enter a valid grade and feedback."},{status:400});
-  const db=createAdminDb();const {data:submission}=await db.from("assignment_submissions").select("id,assignment_id,course_assignments(course_id,max_points,courses(teacher_id))").eq("id",submissionId).maybeSingle();
-  const assignment:any=submission?.course_assignments;const course:any=Array.isArray(assignment?.courses)?assignment.courses[0]:assignment?.courses;
-  if(!submission||!assignment||(profile.role==="teacher"&&course?.teacher_id!==user.id))return NextResponse.json({error:"You cannot grade this submission."},{status:403});
+  const db=createAdminDb();const {data:submission}=await db.from("assignment_submissions").select("id,assignment_id").eq("id",submissionId).maybeSingle();
+  if(!submission)return NextResponse.json({error:"Submission not found."},{status:404});
+  const {data:assignment}=await db.from("course_assignments").select("course_id,max_points").eq("id",submission.assignment_id).maybeSingle();
+  if(!assignment)return NextResponse.json({error:"Assignment not found."},{status:404});
+  const {data:course}=await db.from("courses").select("teacher_id").eq("id",assignment.course_id).maybeSingle();
+  if(profile.role==="teacher"&&course?.teacher_id!==user.id)return NextResponse.json({error:"You cannot grade this submission."},{status:403});
   if(grade>assignment.max_points)return NextResponse.json({error:"Grade cannot exceed the maximum points."},{status:400});
   const {error}=await db.from("assignment_submissions").update({grade,feedback,status:"graded",graded_by:user.id,graded_at:new Date().toISOString()}).eq("id",submissionId);
   if(error)throw error;return NextResponse.json({ok:true});

@@ -98,6 +98,7 @@ export default async function TeacherPage() {
         <p>Open your course studio to create modules, add lessons and upload private class videos. You can also schedule live sessions for your learners.</p>
         <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
           <Link className="primary inlineButton" href="/teacher/live-classes">Schedule a live class ↗</Link>
+          <Link className="outline" href="/teacher/students">Manage students ↗</Link>
           <Link className="outline" href="/live-classes">Open classrooms</Link>
           <Link className="outline" href="/profile">Update teacher profile</Link>
         </div>

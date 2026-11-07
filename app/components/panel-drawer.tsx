@@ -5,8 +5,8 @@ import {usePathname} from "next/navigation";
 import {useState} from "react";
 
 const menus={
- student:{label:"Student workspace",links:[["Dashboard","/student"],["My courses","/student/courses"],["Live classes","/live-classes"],["My profile","/profile"],["Support","/support"]]},
- teacher:{label:"Teacher workspace",links:[["Dashboard","/teacher"],["My live classes","/teacher/live-classes"],["All classrooms","/live-classes"],["My profile","/profile"],["Support","/support"]]},
+ student:{label:"Student workspace",links:[["Dashboard","/student"],["My courses","/student/courses"],["Assignments","/student/assignments"],["My quizzes","/student/quizzes"],["My certificates","/student/certificates"],["My receipts","/student/receipts"],["Live classes","/live-classes"],["DuKu Chat","/chat"],["Help & support","/support"],["My profile","/profile"]]},
+ teacher:{label:"Teacher workspace",links:[["Dashboard","/teacher"],["Assignments & grading","/teacher/assignments"],["Manage students","/teacher/students"],["Quiz results","/teacher/quiz-results"],["Class attendance","/teacher/live-classes/attendance"],["My live classes","/teacher/live-classes"],["All classrooms","/live-classes"],["DuKu Chat","/chat"],["My profile","/profile"],["Support","/support"]]},
  admin:{label:"Admin control center",links:[["Dashboard","/admin"],["Users & roles","/admin/users"],["Courses","/admin/courses"],["Assessments","/admin/assessments"],["Enrollments","/admin/enrollments"],["Payments","/admin/payments"],["Live classes","/admin/live-classes"],["Attendance","/admin/live-classes/attendance"],["Support inbox","/admin/support"],["Website editor","/admin/website"],["Settings","/admin/settings"],["My profile","/profile"]]}
 };
 

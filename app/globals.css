@@ -111,3 +111,60 @@ body:not(.reduce-motion) .portalContent,body:not(.reduce-motion) .section,body:n
 button,a,.courseCard,.portalPanel,.profileEditor{transition:transform .22s ease,border-color .22s ease,background .22s ease,box-shadow .22s ease}
 @media(max-width:650px){.panelMenuTrigger{top:78px;right:12px;width:42px;height:42px}.portalHeader{padding:0 14px}.classPeople{padding:16px}.classPeopleHead{align-items:flex-start;flex-direction:column}.meetFrame,.meetFrameInner{min-height:520px;height:520px}.meetWatermark{flex-wrap:wrap}.meetWatermark small{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+
+/* GLASS UI V2 — improved contrast, depth and motion */
+:root{--glass-bg:rgba(17,27,46,.68);--glass-line:rgba(173,190,231,.23);--glass-text:#f5f7ff;--glass-muted:#c0cce0;--glass-accent:#b9a5ff}
+body{color:var(--glass-text)!important;background:radial-gradient(ellipse at 12% 5%,rgba(93,107,173,.25),transparent 34%),radial-gradient(ellipse at 88% 22%,rgba(138,93,177,.18),transparent 30%),linear-gradient(145deg,#070b14 0%,#0b1424 52%,#080d18 100%) fixed!important}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background-image:radial-gradient(rgba(205,216,255,.17) .7px,transparent .7px);background-size:28px 28px;opacity:.16}
+.topbar,.portalHeader,.ownershipBanner{background:rgba(8,14,26,.76)!important;border-color:var(--glass-line)!important;backdrop-filter:blur(28px) saturate(175%)}
+.hero{background:linear-gradient(115deg,rgba(18,29,50,.94),rgba(34,37,69,.78))!important;border-bottom:1px solid var(--glass-line)}
+.section,.portalContent,.dashMain{color:var(--glass-text)!important}
+.section h2,.hero h1,.featureBand h2,.infoPage h2,.dashTop h2,.portalContent h1,.authCard h1{color:#f7f8ff!important;text-shadow:0 2px 22px #0005}
+.heroCopy>p,.sectionHead p,.featureBand p,.infoPage>p,.courseBody p,.portalPanel p,.authCard>p,.profilePage>p,.whyGrid p{color:var(--glass-muted)!important}
+.eyebrow,.courseMeta,.trustbar span{color:#c7baff!important}
+.courseCard,.courseBody,.portalPanel,.portalMetrics>div,.metricGrid>div,.dashPanel,.profileEditor,.authCard,.authModal,.floatingNote,.classPeople,.meetShell{background:linear-gradient(145deg,rgba(31,45,70,.74),rgba(13,22,39,.78))!important;border:1px solid var(--glass-line)!important;border-radius:20px!important;backdrop-filter:blur(26px) saturate(160%)!important;box-shadow:0 20px 60px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.12)!important}
+.courseCard{overflow:hidden}.courseCard:hover,.portalPanel:hover,.metricGrid>div:hover{transform:translateY(-5px);border-color:rgba(190,174,255,.55)!important;box-shadow:0 25px 65px #0006,0 0 28px #9a8bff18!important}
+.courseBody{border:0!important;border-radius:0 0 20px 20px!important;box-shadow:none!important}
+.courseVisual{border-bottom:1px solid var(--glass-line);filter:saturate(.9)}
+.courseVisual label{border:1px solid #ffffff26;border-radius:30px;background:rgba(10,17,31,.78)!important;color:#e6ddff!important;backdrop-filter:blur(12px)}
+.courseBottom{border-color:#ffffff20!important}
+.courseBottom strong,.metricGrid strong,.portalMetrics strong{color:#fff!important}
+.courseBottom button,.portalPanel a,.authFoot a,.backLink{color:#c5b5ff!important}
+.trustbar{background:rgba(15,24,42,.72)!important;border-color:var(--glass-line)!important;backdrop-filter:blur(22px)}
+.featureBand{background:linear-gradient(125deg,rgba(34,40,74,.94),rgba(67,48,94,.86))!important;border-top:1px solid #ffffff20;border-bottom:1px solid #ffffff20}
+.featureStats{border-color:#ffffff35}.featureStats div{border-color:#ffffff25}
+.primary,.lightButton{border-radius:13px!important;background:linear-gradient(120deg,#766be0,#a17be9)!important;box-shadow:0 10px 30px #7e6be955,inset 0 1px #ffffff66!important;transition:transform .25s,filter .25s,box-shadow .25s}
+.primary:hover,.lightButton:hover{transform:translateY(-3px) scale(1.015);filter:brightness(1.12);box-shadow:0 15px 38px #8e79ff66!important}
+.outline,.textButton{border-radius:12px!important;color:#e7eaff!important}
+.filters input,.filters select,.authCard input,.authCard select,.authModal input,.authModal select,.profileGrid input,.profileGrid textarea{background:rgba(5,11,21,.62)!important;color:#f4f6ff!important;border:1px solid #66799b88!important;border-radius:11px!important}
+input::placeholder,textarea::placeholder{color:#9eacc3!important;opacity:1}
+.profileGrid label,.authCard label,.profileIdentityText span,.profileSecurity span,.metricGrid small,.portalMetrics small{color:#c2cde0!important}
+.profileSecurity{background:rgba(132,145,205,.12)!important;border-color:#ffffff24!important;border-radius:14px}
+.profileAvatar{border:1px solid #c5b5ff99;box-shadow:0 0 24px #9c83ff44}
+.sideNav{background:rgba(7,13,24,.86)!important;border-right:1px solid var(--glass-line);backdrop-filter:blur(28px)}
+.sideNav button{border-radius:11px!important}.sideNav button:hover,.sideNav button.selected{background:linear-gradient(100deg,#7467c455,#a17be933)!important;color:#fff!important}
+.panelMenuTrigger{top:76px!important;border-radius:16px!important;background:rgba(25,35,61,.82)!important;border:1px solid #b7a5ff88!important;box-shadow:0 12px 35px #0006,0 0 22px #9a83ff22!important}
+.panelDrawer{background:linear-gradient(155deg,rgba(28,40,68,.98),rgba(7,13,24,.99))!important;backdrop-filter:blur(30px)}
+.portalLinks a,.portalCourse,.classPerson{border-radius:13px!important;border-color:#ffffff24!important;background:rgba(255,255,255,.035)}
+.portalLinks a:hover{background:#9a8bff20!important;transform:translateY(-2px)}
+.notice{background:rgba(24,36,59,.96)!important;color:#f4f6ff!important;border:1px solid #ffffff30!important;border-radius:14px;backdrop-filter:blur(20px)}
+.modalShade{backdrop-filter:blur(10px)}
+footer{background:rgba(4,8,16,.94)!important;border-top:1px solid var(--glass-line)}
+.floatingNote{border-radius:16px!important}
+.heroArt .artOrb{filter:drop-shadow(0 20px 45px #8c7dff44)}
+.heroArt .cardFront,.heroArt .cardBack{border:1px solid #ffffff45;box-shadow:0 25px 65px #0005}
+.heroArt .cardFront{border-radius:18px}.heroArt .cardBack{border-radius:18px}
+@keyframes glassFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes glassGlow{0%,100%{box-shadow:0 0 18px #9a8bff16}50%{box-shadow:0 0 38px #9a8bff35}}
+@keyframes glassReveal{from{opacity:0;transform:translateY(22px) scale(.985);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+.heroArt .artOrb{animation:glassFloat 7s ease-in-out infinite}
+.heroArt .cardFront{animation:glassFloat 6s ease-in-out infinite}
+.heroArt .cardBack{animation:glassFloat 7.5s ease-in-out infinite reverse}
+.floatingNote{animation:glassFloat 5.5s ease-in-out infinite}
+.courseCard,.portalPanel,.metricGrid>div,.portalMetrics>div{animation:glassReveal .7s ease both}
+.courseCard:nth-child(2),.portalPanel:nth-child(2){animation-delay:.08s}.courseCard:nth-child(3),.portalPanel:nth-child(3){animation-delay:.16s}
+.panelMenuTrigger{animation:glassGlow 4s ease-in-out infinite}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #c4b2ff!important;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.heroArt .artOrb,.heroArt .cardFront,.heroArt .cardBack,.floatingNote,.panelMenuTrigger{animation:none!important}}
+@media(max-width:650px){.courseCard,.portalPanel,.metricGrid>div,.portalMetrics>div{border-radius:16px!important}.heroArt .artOrb{width:280px;height:280px}}

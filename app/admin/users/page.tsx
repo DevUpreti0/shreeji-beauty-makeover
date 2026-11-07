@@ -1,13 +1,13 @@
 import Link from "next/link";
 import {redirect} from "next/navigation";
 import {revalidatePath} from "next/cache";
-import {isAdminSessionValid} from "@/lib/admin-session";
+import {canAdminAccess} from "@/lib/admin-session";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
 import {createAdminDb} from "@/lib/supabase/admin";
 export const dynamic="force-dynamic";
 async function updateRole(formData:FormData){
  "use server";
- if(!await isAdminSessionValid())redirect("/login");
+ if(!await canAdminAccess("users"))redirect("/admin");
  const id=String(formData.get("id")||"");
  const role=String(formData.get("role")||"");
  if(!id||!["student","teacher","admin"].includes(role))return;
@@ -16,7 +16,7 @@ async function updateRole(formData:FormData){
  revalidatePath("/admin/users");
 }
 export default async function AdminUsers(){
- if(!await isAdminSessionValid())redirect("/login");
+ if(!await canAdminAccess("users"))redirect("/admin");
  let users:Array<{id:string;full_name:string;role:string;created_at:string}>=[];
  let error="";
  try{const db=await createSupabaseServerClient();const result=await db.from("profiles").select("id,full_name,role,created_at").order("created_at",{ascending:false}).limit(100);if(result.error)throw result.error;users=result.data||[];}catch{error="Database is not connected or the LMS migration has not been applied.";}

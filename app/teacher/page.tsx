@@ -18,6 +18,7 @@ export default async function TeacherPage() {
   return <main className="portalPage">
     <header className="portalHeader">
       <Link href="/" className="brand">SHREEJI <b>TEACHER</b></Link>
+      <Link href="/profile" className="outline">My profile</Link>
       <form action="/auth/signout" method="post"><button className="outline">Sign out</button></form>
     </header>
     <section className="portalContent">

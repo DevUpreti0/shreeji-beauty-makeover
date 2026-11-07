@@ -15,7 +15,10 @@ export async function POST(req:NextRequest){
   if(!course||(profile.role==="teacher"&&course.teacher_id!==user.id))return NextResponse.json({error:"You cannot create assignments for this course."},{status:403});
   const dueAt=body.dueAt?new Date(body.dueAt):null;if(dueAt&&Number.isNaN(dueAt.getTime()))return NextResponse.json({error:"Invalid due date."},{status:400});
   const {data,error}=await db.from("course_assignments").insert({course_id:courseId,title,description,due_at:dueAt?.toISOString()||null,max_points:maxPoints,created_by:user.id}).select("id").single();
-  if(error)throw error;return NextResponse.json({ok:true,id:data.id});
+  if(error)throw error;
+  const {data:learners}=await db.from("enrollments").select("student_id").eq("course_id",courseId).eq("status","active");
+  if(learners?.length)await db.from("user_notifications").insert(learners.map((x:any)=>({user_id:x.student_id,title:"New assignment: "+title,body:"A new assignment is available in your course. Open the assignments centre to submit your work.",href:"/student/assignments",kind:"assignment"})));
+  return NextResponse.json({ok:true,id:data.id});
  }catch(e){console.error("Create assignment failed",e);return NextResponse.json({error:"Could not create assignment."},{status:500});}
 }
 export async function PATCH(req:NextRequest){
@@ -26,7 +29,7 @@ export async function PATCH(req:NextRequest){
   if(profile.role==="admin"&&!await canAdminAccess("courses",true))return NextResponse.json({error:"You do not have edit access to courses."},{status:403});
   const body=await req.json();const submissionId=String(body.submissionId||"");const grade=Number(body.grade);const feedback=String(body.feedback||"").trim();
   if(!submissionId||!Number.isInteger(grade)||grade<0||grade>1000||feedback.length>4000)return NextResponse.json({error:"Enter a valid grade and feedback."},{status:400});
-  const db=createAdminDb();const {data:submission}=await db.from("assignment_submissions").select("id,assignment_id").eq("id",submissionId).maybeSingle();
+  const db=createAdminDb();const {data:submission}=await db.from("assignment_submissions").select("id,assignment_id,student_id").eq("id",submissionId).maybeSingle();
   if(!submission)return NextResponse.json({error:"Submission not found."},{status:404});
   const {data:assignment}=await db.from("course_assignments").select("course_id,max_points").eq("id",submission.assignment_id).maybeSingle();
   if(!assignment)return NextResponse.json({error:"Assignment not found."},{status:404});
@@ -34,6 +37,8 @@ export async function PATCH(req:NextRequest){
   if(profile.role==="teacher"&&course?.teacher_id!==user.id)return NextResponse.json({error:"You cannot grade this submission."},{status:403});
   if(grade>assignment.max_points)return NextResponse.json({error:"Grade cannot exceed the maximum points."},{status:400});
   const {error}=await db.from("assignment_submissions").update({grade,feedback,status:"graded",graded_by:user.id,graded_at:new Date().toISOString()}).eq("id",submissionId);
-  if(error)throw error;return NextResponse.json({ok:true});
+  if(error)throw error;
+  await db.from("user_notifications").insert({user_id:submission.student_id,title:"Your assignment was graded",body:"Your teacher has reviewed your submission. Open assignments to see your score and feedback.",href:"/student/assignments",kind:"grade"});
+  return NextResponse.json({ok:true});
  }catch(e){console.error("Grade submission failed",e);return NextResponse.json({error:"Could not save grade."},{status:500});}
 }

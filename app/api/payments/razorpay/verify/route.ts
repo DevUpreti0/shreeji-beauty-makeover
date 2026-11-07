@@ -20,6 +20,6 @@ export async function POST(req:NextRequest){
   if(updateError)return NextResponse.json({error:"Payment verified but access update failed. Contact support with payment ID "+paymentId},{status:500});
   const {error:enrollError}=await db.from("enrollments").upsert({student_id:user.id,course_id:record.course_id,status:"active"},{onConflict:"student_id,course_id"});
   if(enrollError)return NextResponse.json({error:"Payment received, but enrollment could not be created. Contact support with payment ID "+paymentId},{status:500});
-  return NextResponse.json({ok:true,redirect:"/student"});
+  return NextResponse.json({ok:true,paymentId:record.id,receiptUrl:"/student/receipts/"+record.id});
  }catch{return NextResponse.json({error:"Could not verify payment. Please contact support if money was deducted."},{status:500});}
 }

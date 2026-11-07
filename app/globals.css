@@ -279,3 +279,22 @@ button,a,.courseCard,.portalPanel,.profileEditor{
  .meetProviderCover{left:8px;bottom:8px;min-width:170px;min-height:44px;padding:7px 9px}
  .meetBottomBar{font-size:9px}
 }
+
+/* Student milestones and teacher analytics */
+.studentNextStep{border-color:#a99aff55!important;background:linear-gradient(135deg,rgba(51,49,91,.72),rgba(18,29,48,.86))!important}
+.studentMilestones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}
+.studentMilestones>div{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid #ffffff20;border-radius:13px;background:#ffffff06;min-width:0}
+.studentMilestones>div>span{width:30px;height:30px;flex-shrink:0;display:grid;place-items:center;border-radius:50%;background:#ffffff12;color:#aebbd1;font-size:17px}
+.studentMilestones>div.unlocked{border-color:#6bd5a355;background:#3b9b7710}
+.studentMilestones>div.unlocked>span{background:#2d9b6d33;color:#8df0bf}
+.studentMilestones b,.studentMilestones small{display:block}
+.studentMilestones b{font-size:11px;color:#f4f5ff}
+.studentMilestones small{font-size:9px;line-height:1.5;color:#b8c5db;margin-top:4px}
+.teacherAnalytics{border-color:#a99aff55!important}
+.teacherAnalyticsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}
+.teacherAnalyticsGrid>div{display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid #ffffff20;border-radius:13px;background:#ffffff06;min-width:0}
+.teacherAnalyticsGrid small{font-size:9px;letter-spacing:1.1px;color:#b9b0df}
+.teacherAnalyticsGrid strong{font-size:25px;color:#fff}
+.teacherAnalyticsGrid span{font-size:10px;line-height:1.4;color:#b8c5db}
+@media(max-width:760px){.studentMilestones{grid-template-columns:1fr}.teacherAnalyticsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.teacherAnalyticsGrid{grid-template-columns:1fr 1fr}.teacherAnalyticsGrid>div{padding:11px}.teacherAnalyticsGrid strong{font-size:21px}}

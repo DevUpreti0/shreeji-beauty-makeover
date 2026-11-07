@@ -11,6 +11,8 @@ async function schedule(form:FormData){
  const courseId=String(form.get("course_id")||""),title=String(form.get("title")||"").trim().slice(0,180),start=parseIndiaDateTime(String(form.get("starts_at")||"")),duration=Number(form.get("duration_minutes")||60);
  if(!courseId||title.length<3||!Number.isFinite(start.getTime())||start.getTime()<Date.now()-60000||!Number.isInteger(duration)||duration<10||duration>240)throw new Error("Enter a valid title, future start time and duration.");
  const {data:course}=await db.from("courses").select("id").eq("id",courseId).eq("teacher_id",user.id).maybeSingle();if(!course)throw new Error("You can schedule classes only for your assigned courses.");
+ const {data:existing}=await db.from("live_classes").select("starts_at,duration_minutes").eq("teacher_id",user.id).in("status",["scheduled","live"]).limit(100);
+ const newEnd=start.getTime()+duration*60000;const conflict=(existing||[]).some((item:any)=>{const oldStart=new Date(item.starts_at).getTime();const oldEnd=oldStart+Number(item.duration_minutes||0)*60000;return start.getTime()<oldEnd&&newEnd>oldStart;});if(conflict)throw new Error("You already have another scheduled or live class during this time.");
  const {error}=await db.from("live_classes").insert({course_id:courseId,teacher_id:user.id,title,starts_at:start.toISOString(),duration_minutes:duration,room_name:"duku-"+randomUUID().replace(/-/g,"")});if(error)throw new Error("Could not schedule this class. Check course ownership and database permissions.");
  revalidatePath("/teacher/live-classes");revalidatePath("/live-classes");
 }

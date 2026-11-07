@@ -39,6 +39,13 @@ export default async function StudentPage() {
   const totalCompleted = courseStats.reduce((sum:any,c:any) => sum + c.completed,0);
   const overall = totalLessons ? Math.round(totalCompleted / totalLessons * 100) : 0;
   const activeCount = courseStats.filter((c:any) => ["active","paid"].includes(c.status)).length;
+  const nextCourse=courseStats.find((c:any)=>c.percent<100);
+  const completedCourses=courseStats.filter((c:any)=>c.total>0&&c.percent===100).length;
+  const milestones=[
+    {label:"First lesson completed",detail:"Your learning journey has started",unlocked:totalCompleted>=1},
+    {label:"Halfway there",detail:"Complete at least half of your lessons",unlocked:overall>=50},
+    {label:"Course finisher",detail:"Finish all lessons in a course",unlocked:completedCourses>=1},
+  ];
   const {data:upcomingClasses} = courseIds.length
     ? await sb.from("live_classes").select("id,title,starts_at,duration_minutes,status,courses(title)").in("course_id",courseIds).in("status",["scheduled","live"]).gte("starts_at",new Date(Date.now()-3*60*60*1000).toISOString()).order("starts_at",{ascending:true}).limit(8)
     : {data:[] as any[]};
@@ -74,6 +81,20 @@ export default async function StudentPage() {
           <div style={{height:"100%",width:overall+"%",background:"linear-gradient(90deg,#b98a61,#e3c39b)",borderRadius:20,transition:"width .4s"}} />
         </div>
       </div>
+
+      <section className="portalPanel studentNextStep" style={{marginBottom:22}}>
+        <div className="eyebrow" style={{marginBottom:8}}>YOUR NEXT MILESTONE</div>
+        {nextCourse ? <>
+          <h2 style={{margin:"0 0 6px"}}>Keep your momentum going</h2>
+          <p style={{margin:"0 0 14px"}}>Continue <b>{nextCourse.course.title}</b> — you have completed {nextCourse.percent}% of this course.</p>
+          <div style={{height:9,borderRadius:20,background:"#ffffff18",overflow:"hidden",maxWidth:520}}><div style={{height:"100%",width:nextCourse.percent+"%",borderRadius:20,background:"linear-gradient(90deg,#756be0,#a98af2)"}}/></div>
+          <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",flexWrap:"wrap",marginTop:14}}>
+            <small style={{color:"#c2cde0"}}>{nextCourse.completed} / {nextCourse.total} lessons completed</small>
+            <Link className="primary inlineButton" href={"/student/courses/"+nextCourse.course.id}>Continue this course ↗</Link>
+          </div>
+        </>:<><h2 style={{margin:"0 0 6px"}}>You completed every course!</h2><p style={{margin:0}}>Amazing work. Explore the catalogue to start your next skill.</p></>}
+        <div className="studentMilestones">{milestones.map((m:any)=><div key={m.label} className={m.unlocked?"unlocked":""}><span>{m.unlocked?"✓":"☆"}</span><div><b>{m.label}</b><small>{m.detail}</small></div></div>)}</div>
+      </section>
 
       <section className="portalPanel" style={{marginBottom:22}}>
         <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}>

@@ -1,0 +1,24 @@
+import Link from "next/link";
+import {redirect} from "next/navigation";
+import {createSupabaseServerClient} from "@/lib/supabase-server";
+import {createAdminDb} from "@/lib/supabase/admin";
+import {formatIndiaDateTime} from "@/lib/datetime";
+export const dynamic="force-dynamic";
+export default async function StudentLiveAttendance(){
+ const auth=await createSupabaseServerClient();const {data:{user}}=await auth.auth.getUser();if(!user)redirect("/login");
+ const {data:profile}=await auth.from("profiles").select("role").eq("id",user.id).maybeSingle();if(profile?.role!=="student")redirect("/login");
+ const db=createAdminDb();
+ const {data:enrollments}=await db.from("enrollments").select("course_id").eq("student_id",user.id).in("status",["active","paid","completed"]);
+ const courseIds=[...new Set((enrollments||[]).map((e:any)=>e.course_id).filter(Boolean))];
+ const {data:classes,error}=courseIds.length?await db.from("live_classes").select("id,title,starts_at,duration_minutes,status,course_id,courses(title)").in("course_id",courseIds).order("starts_at",{ascending:false}).limit(100):{data:[] as any[],error:null};
+ const ids=(classes||[]).map((c:any)=>c.id);
+ const {data:attendance}=ids.length?await db.from("live_class_attendance").select("live_class_id,joined_at,left_at,last_seen_at").eq("user_id",user.id).in("live_class_id",ids):{data:[] as any[]};
+ const attended=new Map((attendance||[]).map((a:any)=>[a.live_class_id,a]));
+ const now=Date.now();
+ const past=(classes||[]).filter((c:any)=>new Date(c.starts_at).getTime()+Number(c.duration_minutes||0)*60000<now||["completed","cancelled"].includes(c.status));
+ const attendedPast=past.filter((c:any)=>attended.has(c.id)&&c.status!=="cancelled").length;
+ const eligible=past.filter((c:any)=>c.status!=="cancelled").length;
+ const rate=eligible?Math.round(attendedPast/eligible*100):0;
+ const upcoming=(classes||[]).filter((c:any)=>new Date(c.starts_at).getTime()+Number(c.duration_minutes||0)*60000>=now&&!["completed","cancelled"].includes(c.status)).length;
+ return <main className="portalPage"><header className="portalHeader"><Link href="/student" className="brand">← STUDENT WORKSPACE</Link><Link href="/live-classes">All classrooms</Link></header><section className="portalContent" style={{maxWidth:1050}}><div className="eyebrow">DUKU MEET · PERSONAL REPORT</div><h1>My class <em>attendance.</em></h1><p>Review the live classes for your enrolled courses and see which sessions have attendance records.</p><div className="portalMetrics" style={{margin:"22px 0"}}><div><small>PAST SESSIONS</small><strong>{eligible}</strong></div><div><small>ATTENDED</small><strong>{attendedPast}</strong></div><div><small>ATTENDANCE RATE</small><strong>{rate}%</strong></div><div><small>UPCOMING</small><strong>{upcoming}</strong></div></div><div className="portalPanel" style={{marginBottom:18}}><div style={{display:"flex",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}><div><h2 style={{margin:"0 0 6px"}}>Attendance overview</h2><p style={{margin:0}}>Based on recorded course sessions. A missing leave signal does not mean you stayed for the full class.</p></div><strong style={{fontSize:30,color:"#d5ad86"}}>{rate}%</strong></div><div style={{height:9,background:"#ffffff20",borderRadius:20,overflow:"hidden",marginTop:16}}><div style={{height:"100%",width:rate+"%",background:"linear-gradient(90deg,#b98a61,#e3c39b)",borderRadius:20}}/></div></div>{error?<div className="portalPanel">Could not load attendance records. Please try again later.</div>:<div style={{display:"grid",gap:12}}>{(classes||[]).map((c:any)=>{const a:any=attended.get(c.id);const future=new Date(c.starts_at).getTime()>now;const signal=a?.last_seen_at&&now-new Date(a.last_seen_at).getTime()<90000&&!a.left_at;return <article className="portalPanel" key={c.id}><div style={{display:"flex",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}><div><small>{String(c.status).toUpperCase()} · {formatIndiaDateTime(c.starts_at)}</small><h2 style={{margin:"7px 0"}}>{c.title}</h2><p>{c.courses?.title||"Course"} · {c.duration_minutes} minutes</p>{a?<small>Joined: {formatIndiaDateTime(a.joined_at)} · {a.left_at?"Left: "+formatIndiaDateTime(a.left_at):signal?"Online now":"Last presence signal unavailable"}</small>:<small>{future?"You have not joined this session yet.":"No attendance record found."}</small>}</div><div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>{a?<span className="meetLivePill isLive">ATTENDANCE RECORDED</span>:<span className="meetLivePill">{future?"UPCOMING":"NOT RECORDED"}</span>}{!["completed","cancelled"].includes(c.status)&&<Link className="outline" href={"/live-classes/"+c.id}>Open classroom ↗</Link>}</div></div></article>})}{!classes?.length&&<div className="portalPanel">No live classes are scheduled for your enrolled courses yet.</div>}</div>}</section></main>;
+}

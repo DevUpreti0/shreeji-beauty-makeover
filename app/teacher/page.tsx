@@ -52,15 +52,7 @@ export default async function TeacherPage() {
   };
 
   return <main className="portalPage">
-    <header className="portalHeader">
-      <Link href="/" className="brand">SHREEJI <b>TEACHER</b></Link>
-      <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
-        <NotificationCenter/>
-        <Link href="/chat" className="outline">DuKu Chat</Link>
-        <Link href="/profile" className="outline">My profile</Link>
-        <form action="/auth/signout" method="post"><button className="outline">Sign out</button></form>
-      </div>
-    </header>
+    <header className="portalHeader"><Link href="/" className="brand">SHREEJI <b>TEACHER</b></Link><NotificationCenter/></header>
     <section className="portalContent" style={{maxWidth:1120}}>
       <div className="eyebrow">TEACHING WORKSPACE</div>
       <h1>Welcome, <em>{profile.full_name || user.email}</em></h1>

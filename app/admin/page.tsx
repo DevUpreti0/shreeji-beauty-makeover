@@ -17,6 +17,7 @@ const sections=[
  {href:"/admin/coupons",title:"Coupons & discounts",desc:"Generate free-course codes, percentage offers and fixed discounts.",icon:"04A"},
  {href:"/admin/live-classes",title:"Live classes",desc:"Schedule and host DuKu Meet classrooms, manage sessions and review attendance.",icon:"05"},
  {href:"/admin/support",title:"Live support inbox",desc:"Read support conversations, reply and close tickets.",icon:"07"},
+ {href:"/chat",title:"DuKu Chat",desc:"Private messaging between administrators, teachers and students.",icon:"CHAT"},
  {href:"/admin/settings",title:"Platform settings",desc:"Configure payment mode, meeting provider and support contact.",icon:"06"},
  {href:"/admin/website",title:"Website content editor",desc:"Edit branding, images, theme, menus, FAQs, testimonials, sections and custom pages with live publishing.",icon:"07"},
  {href:"/teacher",title:"Teacher workspace",desc:"Open teaching workspace and course authoring.",icon:"08"},

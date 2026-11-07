@@ -1,11 +1,11 @@
 import Link from "next/link";
 import {redirect} from "next/navigation";
 import {revalidatePath} from "next/cache";
-import {isAdminSessionValid} from "@/lib/admin-session";
+import {canAdminAccess} from "@/lib/admin-session";
 import {createAdminDb} from "@/lib/supabase/admin";
 export const dynamic="force-dynamic";
 async function createQuiz(formData:FormData){
- "use server";if(!await isAdminSessionValid())redirect("/login");
+ "use server";if(!await canAdminAccess("assessments"))redirect("/admin");
  const courseId=String(formData.get("course_id")||"");const title=String(formData.get("title")||"").trim();const description=String(formData.get("description")||"").trim();const raw=String(formData.get("questions")||"");const passing=Number(formData.get("passing_score")||70);
  if(!courseId||!title||title.length>180||!Number.isInteger(passing)||passing<0||passing>100)return;
  let questions:any;try{questions=JSON.parse(raw);if(!Array.isArray(questions)||questions.length<1||questions.length>50)throw new Error();for(const q of questions){if(typeof q.question!=="string"||!q.question.trim()||!Array.isArray(q.options)||q.options.length<2||q.options.length>6||!Number.isInteger(q.correctIndex)||q.correctIndex<0||q.correctIndex>=q.options.length||q.options.some((x:any)=>typeof x!=="string"))throw new Error();}}catch{return;}
@@ -14,12 +14,12 @@ async function createQuiz(formData:FormData){
  if(error)throw new Error("Quiz could not be saved. Check the assessment migration and course.");revalidatePath("/admin/assessments");
 }
 async function publishQuiz(formData:FormData){
- "use server";if(!await isAdminSessionValid())redirect("/login");
+ "use server";if(!await canAdminAccess("assessments"))redirect("/admin");
  const id=String(formData.get("quiz_id")||"");const published=String(formData.get("published")||"")==="true";if(!id)return;
  const {error}=await createAdminDb().from("course_quizzes").update({is_published:published,updated_at:new Date().toISOString()}).eq("id",id);if(error)throw new Error("Could not update quiz publication.");revalidatePath("/admin/assessments");
 }
 export default async function AssessmentsPage(){
- if(!await isAdminSessionValid())redirect("/login");const db=createAdminDb();
+ if(!await canAdminAccess("assessments"))redirect("/admin");const db=createAdminDb();
  const [{data:courses},{data:quizzes,error}]=await Promise.all([db.from("courses").select("id,title").order("created_at",{ascending:false}),db.from("course_quizzes").select("id,course_id,title,description,questions,passing_score,is_published,created_at").order("created_at",{ascending:false})]);
  const courseMap=new Map((courses||[]).map(c=>[c.id,c.title]));
  return <main className="portalPage"><header className="portalHeader"><Link href="/admin" className="brand">← ADMIN DASHBOARD</Link></header><section className="portalContent"><div className="eyebrow">LEARNING ASSESSMENT CENTER</div><h1>Quizzes & <em>assessments.</em></h1><p>Create multiple-choice assessments for courses and control when they are published.</p>

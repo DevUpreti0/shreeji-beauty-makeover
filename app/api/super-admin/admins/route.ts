@@ -1,0 +1,45 @@
+import {NextRequest,NextResponse} from "next/server";
+import {currentAdminIdentity} from "@/lib/admin-session";
+import {createAdminDb} from "@/lib/supabase/admin";
+export const dynamic="force-dynamic";
+const sections=["users","courses","assessments","enrollments","payments","coupons","live-classes","support","settings","website"];
+export async function GET(){
+ const actor=await currentAdminIdentity();if(!actor?.isSuperAdmin)return NextResponse.json({error:"Super admin access required."},{status:403});
+ const db=createAdminDb();
+ const [{data:profiles,error},{data:permissions},{data:owners}]=await Promise.all([
+  db.from("profiles").select("id,full_name,role,created_at").eq("role","admin").order("created_at",{ascending:false}),
+  db.from("admin_section_permissions").select("admin_id,section_key,can_view,can_edit"),
+  db.from("super_admins").select("user_id")
+ ]);
+ if(error)return NextResponse.json({error:"Could not load administrators."},{status:500});
+ const admins=await Promise.all((profiles||[]).map(async(p:any)=>{const {data}=await db.auth.admin.getUserById(p.id);return {...p,email:data?.user?.email||"",isSuperAdmin:(owners||[]).some((o:any)=>o.user_id===p.id),permissions:(permissions||[]).filter((x:any)=>x.admin_id===p.id)};}));
+ return NextResponse.json({admins,sections});
+}
+export async function PATCH(req:NextRequest){
+ const actor=await currentAdminIdentity();if(!actor?.isSuperAdmin)return NextResponse.json({error:"Only the super admin can change administrator access."},{status:403});
+ try{
+  const body=await req.json();const db=createAdminDb();const target=String(body.adminId||"");
+  if(!target||target===actor.user.id)return NextResponse.json({error:"Select another administrator."},{status:400});
+  const {data:targetProfile}=await db.from("profiles").select("id,role").eq("id",target).maybeSingle();
+  if(!targetProfile)return NextResponse.json({error:"Account not found."},{status:404});
+  if(body.action==="appoint"){
+   const {error}=await db.from("profiles").update({role:"admin"}).eq("id",target);
+   if(error)throw error;
+   await db.from("admin_access_audit").insert({actor_id:actor.user.id,target_admin_id:target,action:"appoint_admin"});
+  }else if(body.action==="remove"){
+   const {data:owner}=await db.from("super_admins").select("user_id").eq("user_id",target).maybeSingle();
+   if(owner)return NextResponse.json({error:"A super admin cannot be removed here."},{status:400});
+   const {error}=await db.from("profiles").update({role:"student"}).eq("id",target);if(error)throw error;
+   await db.from("admin_section_permissions").delete().eq("admin_id",target);
+   await db.from("admin_access_audit").insert({actor_id:actor.user.id,target_admin_id:target,action:"remove_admin"});
+  }else if(body.action==="permission"){
+   if(!sections.includes(body.section))return NextResponse.json({error:"Unknown admin section."},{status:400});
+   const canView=!!body.canView,canEdit=!!body.canEdit;
+   if(canEdit&&!canView)return NextResponse.json({error:"Edit access requires view access."},{status:400});
+   if(canView){const {error}=await db.from("admin_section_permissions").upsert({admin_id:target,section_key:body.section,can_view:true,can_edit:canEdit,updated_by:actor.user.id,updated_at:new Date().toISOString()},{onConflict:"admin_id,section_key"});if(error)throw error;}
+   else {const {error}=await db.from("admin_section_permissions").delete().eq("admin_id",target).eq("section_key",body.section);if(error)throw error;}
+   await db.from("admin_access_audit").insert({actor_id:actor.user.id,target_admin_id:target,action:"set_section_permission",section_key:body.section,details:{can_view:canView,can_edit:canEdit}});
+  }else return NextResponse.json({error:"Unknown action."},{status:400});
+  return NextResponse.json({ok:true});
+ }catch(e){console.error("Super admin permission update",e);return NextResponse.json({error:"Could not update administrator access."},{status:500});}
+}

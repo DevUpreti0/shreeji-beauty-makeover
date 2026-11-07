@@ -5,6 +5,7 @@ import StudentQuizCenter from "./student-quiz-center";
 export const dynamic="force-dynamic";
 export default async function StudentQuizzesPage(){
  const sb=await createSupabaseServerClient();const {data:{user}}=await sb.auth.getUser();if(!user)redirect("/login");
+ const {data:profile}=await sb.from("profiles").select("role").eq("id",user.id).maybeSingle();if(profile?.role!=="student")redirect("/login");
  const {data:enrollments}=await sb.from("enrollments").select("course_id,courses(title)").eq("student_id",user.id).eq("status","active");
  const courseIds=(enrollments||[]).map((e:any)=>e.course_id);
  const {data:rawQuizzes}=courseIds.length?await sb.from("course_quizzes").select("id,course_id,title,description,questions,passing_score").in("course_id",courseIds).eq("is_published",true).order("created_at",{ascending:false}):{data:[] as any[]};

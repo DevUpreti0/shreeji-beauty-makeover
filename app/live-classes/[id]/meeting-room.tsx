@@ -21,7 +21,7 @@ export default function MeetingRoom({roomName,displayName,classId,isHost=false}:
    apiRef.current=api;
    api.addListener("videoConferenceJoined",()=>{if(disposed)return;hasJoined=true;joinedAt.current=Date.now();setJoined(true);setParticipants(1);setConnection("Connected · attendance recorded");void record("joined");stopHeartbeat();heartbeatTimer=window.setInterval(()=>{if(hasJoined)void record("heartbeat");},25000);if(isHost&&api){const localId=api.getLocalParticipantId?.();const local=api.getParticipantsInfo?.().find((p:any)=>p.participantId===localId);setModerator(local?.role==="moderator");}});
    api.addListener("participantRoleChanged",(e:any)=>{if(isHost&&e?.id===api?.getLocalParticipantId?.())setModerator(e.role==="moderator");});
-   api.addListener("connectionQualityChanged",(e:any)=>{const q=String(e?.connectionQuality||e?.quality||"unknown").toLowerCase();setConnectionQuality(q==="good"?"Good":q==="poor"?"Poor":q==="nonoptimal"?"Fair":q);});
+   api.addListener("connectionQualityChanged",(e:any)=>{const localId=api?.getLocalParticipantId?.();if(e?.participantId&&localId&&e.participantId!==localId)return;const q=String(e?.connectionQuality||e?.quality||"unknown").toLowerCase();setConnectionQuality(q==="good"?"Good":q==="poor"?"Poor":q==="nonoptimal"?"Fair":q);});
    api.addListener("participantJoined",()=>setParticipants(n=>n+1));
    api.addListener("participantLeft",()=>setParticipants(n=>Math.max(1,n-1)));
    api.addListener("audioMuteStatusChanged",(e:any)=>setAudioMuted(!!e?.muted));

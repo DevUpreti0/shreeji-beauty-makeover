@@ -31,8 +31,8 @@ export default function MeetingRoom({roomName,displayName,classId}:{roomName:str
   };
   if(window.JitsiMeetExternalAPI)mount();else{
    const existing=document.querySelector<HTMLScriptElement>('script[data-duku-jitsi="true"]');
-   if(existing){script=existing;if((existing as any).dataset.loaded==="true")mount();else{existing.addEventListener("load",mount,{once:true});existing.addEventListener("error",()=>setLoadError("Could not load the meeting service. Check your internet connection and retry."),{once:true});}}
-   else{script=document.createElement("script");script.src="https://meet.jit.si/external_api.js";script.async=true;script.dataset.dukuJitsi="true";script.onload=()=>{script!.dataset.loaded="true";mount();};script.onerror=()=>{setConnection("Meeting service unavailable");setLoadError("Could not load the meeting service. Check your internet connection and retry.");};document.head.appendChild(script);}
+   if(existing){script=existing;if((existing as any).dataset.loaded==="true")mount();else{existing.addEventListener("load",mount,{once:true});existing.addEventListener("error",()=>{existing.remove();setLoadError("Could not load the meeting service. Check your internet connection and retry.");},{once:true});}}
+   else{script=document.createElement("script");script.src="https://meet.jit.si/external_api.js";script.async=true;script.dataset.dukuJitsi="true";script.onload=()=>{script!.dataset.loaded="true";mount();};script.onerror=()=>{script?.remove();setConnection("Meeting service unavailable");setLoadError("Could not load the meeting service. Check your internet connection and retry.");};document.head.appendChild(script);}
   }
   const onPageHide=()=>{if(hasJoined){hasJoined=false;void record("left");}};
   window.addEventListener("pagehide",onPageHide);

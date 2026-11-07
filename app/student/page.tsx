@@ -3,6 +3,7 @@ import {redirect} from "next/navigation";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
 import StudyPlanner from "./study-planner";
 import NotificationCenter from "@/app/components/notification-center";
+import {formatIndiaDateTime} from "@/lib/datetime";
 
 export const dynamic = "force-dynamic";
 
@@ -113,7 +114,7 @@ export default async function StudentPage() {
         </div>
         {upcomingClasses?.length ? <div style={{display:"grid",gap:10,marginTop:16}}>
           {upcomingClasses.map((c:any) => <article className="portalCourse" key={c.id}>
-            <div style={{flex:1,minWidth:180}}><b>{c.title}</b><span>{c.courses?.title || "Your course"} · {new Date(c.starts_at).toLocaleString("en-IN")} · {c.duration_minutes} min</span><small style={{display:"inline-block",marginTop:6,color:c.status==="live"?"#8df0bf":"#c8bbff",letterSpacing:1}}>{c.status==="live"?"● LIVE NOW":"SCHEDULED"}</small></div>
+            <div style={{flex:1,minWidth:180}}><b>{c.title}</b><span>{c.courses?.title || "Your course"} · {formatIndiaDateTime(c.starts_at)} · {c.duration_minutes} min</span><small style={{display:"inline-block",marginTop:6,color:c.status==="live"?"#8df0bf":"#c8bbff",letterSpacing:1}}>{c.status==="live"?"● LIVE NOW":"SCHEDULED"}</small></div>
             <Link className="primary inlineButton" href={"/live-classes/"+c.id}>{c.status==="live"?"Join live class ↗":"Open class details ↗"}</Link>
           </article>)}
         </div> : <div style={{padding:"18px 0 4px"}}><p>No upcoming sessions yet. New classes scheduled for your enrolled courses will appear here.</p></div>}

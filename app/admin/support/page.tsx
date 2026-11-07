@@ -24,6 +24,7 @@ async function setStatus(formData:FormData){
 }
 export default async function SupportInbox(){
  if(!await canAdminAccess("support"))redirect("/admin");
+ const canEdit=await canAdminAccess("support",true);
  const db=createAdminDb();
  const [{data:threads,error},{data:allProfiles},{data:allEnrollments},{data:allPayments}] = await Promise.all([
   db.from("support_conversations").select("id,user_id,subject,status,created_at,updated_at").order("updated_at",{ascending:false}).limit(100),
@@ -45,7 +46,7 @@ export default async function SupportInbox(){
   const p=profileMap.get(t.user_id),auth=authMap.get(t.user_id),enrollments=(allEnrollments||[]).filter(x=>x.student_id===t.user_id),payments=(allPayments||[]).filter(x=>x.student_id===t.user_id),threadMessages=(messages||[]).filter(m=>m.conversation_id===t.id);
   const phone=auth?.phone||auth?.metadata?.phone||auth?.metadata?.mobile||"Not provided";
   return <article className="portalPanel" key={t.id}>
-   <div style={{display:"flex",justifyContent:"space-between",gap:12,flexWrap:"wrap",alignItems:"flex-start"}}><div><div className="eyebrow">CUSTOMER TICKET · {t.id.slice(0,8).toUpperCase()}</div><h2 style={{margin:"4px 0"}}>{t.subject}</h2><small>Opened {new Date(t.created_at).toLocaleString("en-IN")} · Last activity {new Date(t.updated_at).toLocaleString("en-IN")}</small></div><form action={setStatus} style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><input type="hidden" name="conversation_id" value={t.id}/><select name="status" defaultValue={t.status}><option value="open">Open</option><option value="pending">Pending</option><option value="closed">Closed</option></select><button className="outline">Save status</button></form></div>
+   <div style={{display:"flex",justifyContent:"space-between",gap:12,flexWrap:"wrap",alignItems:"flex-start"}}><div><div className="eyebrow">CUSTOMER TICKET · {t.id.slice(0,8).toUpperCase()}</div><h2 style={{margin:"4px 0"}}>{t.subject}</h2><small>Opened {new Date(t.created_at).toLocaleString("en-IN")} · Last activity {new Date(t.updated_at).toLocaleString("en-IN")}</small></div>{canEdit?<form action={setStatus} style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><input type="hidden" name="conversation_id" value={t.id}/><select name="status" defaultValue={t.status}><option value="open">Open</option><option value="pending">Pending</option><option value="closed">Closed</option></select><button className="outline">Save status</button></form>:<small>View-only access</small>}</div>
    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:10,marginTop:15}}>
     <div style={{padding:13,borderRadius:10,background:"#f8f4f0"}}><small>CUSTOMER</small><p style={{margin:"5px 0",fontWeight:700}}>{p?.full_name||auth?.metadata?.full_name||auth?.metadata?.name||"Customer"}</p><small>{p?.role||"student"} · Account since {p?.created_at?new Date(p.created_at).toLocaleDateString("en-IN"):auth?.createdAt?new Date(auth.createdAt).toLocaleDateString("en-IN"):"—"}</small></div>
     <div style={{padding:13,borderRadius:10,background:"#f8f4f0"}}><small>CONTACT DETAILS</small><p style={{margin:"5px 0",overflowWrap:"anywhere"}}>{auth?.email||"Email unavailable"}</p><small>Phone: {phone}</small></div>
@@ -54,7 +55,7 @@ export default async function SupportInbox(){
    </div>
    {auth?.lastSignIn&&<small style={{display:"block",marginTop:9,opacity:.7}}>Last sign in: {new Date(auth.lastSignIn).toLocaleString("en-IN")}</small>}
    <div style={{margin:"16px 0 12px",display:"grid",gap:9}}>{threadMessages.map(m=><div key={m.id} style={{padding:12,borderRadius:10,background:m.sender_id===t.user_id?"#f5f0eb":"#eef4f5",maxWidth:"100%"}}><small style={{fontWeight:700}}>{m.sender_id===t.user_id?"CUSTOMER":"SUPPORT TEAM"} · {new Date(m.created_at).toLocaleString("en-IN")}</small><p style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere",margin:"5px 0 0"}}>{m.body}</p></div>)}{!threadMessages.length&&<small>No messages in this ticket yet.</small>}</div>
-   <form action={reply} style={{display:"flex",gap:8,flexWrap:"wrap"}}><input type="hidden" name="conversation_id" value={t.id}/><input name="body" required maxLength={5000} placeholder="Reply to this customer…" style={{flex:"1 1 250px"}}/><button className="primary">Send reply</button></form>
+   {canEdit?<form action={reply} style={{display:"flex",gap:8,flexWrap:"wrap"}}><input type="hidden" name="conversation_id" value={t.id}/><input name="body" required maxLength={5000} placeholder="Reply to this customer…" style={{flex:"1 1 250px"}}/><button className="primary">Send reply</button></form>:<p style={{fontSize:13,opacity:.7}}>You can view this conversation but do not have permission to reply or change its status.</p>}
    <div style={{display:"flex",gap:14,flexWrap:"wrap",marginTop:12,fontSize:12}}><Link href={"/admin/users"}>Open customer directory →</Link><span style={{opacity:.65}}>Customer ID: {t.user_id}</span></div>
   </article>;
  })}

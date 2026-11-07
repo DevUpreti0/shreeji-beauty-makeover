@@ -55,19 +55,7 @@ export default async function StudentPage() {
     : {data:[] as any[]};
 
   return <main className="portalPage">
-    <header className="portalHeader">
-      <Link href="/" className="brand">SHREEJI <b>LEARNER</b></Link>
-      <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
-        <NotificationCenter/>
-        <Link href="/chat" className="outline">DuKu Chat</Link>\n        <Link href="/support" className="outline">Help & support</Link>
-        <Link href="/student/assignments" className="outline">Assignments</Link>
-        <Link href="/student/quizzes" className="outline">My quizzes</Link>
-        <Link href="/student/certificates" className="outline">My certificates</Link>
-        <Link href="/student/receipts" className="outline">My receipts</Link>
-        <Link href="/profile" className="outline">My profile</Link>
-        <form action="/auth/signout" method="post"><button className="outline">Sign out</button></form>
-      </div>
-    </header>
+    <header className="portalHeader"><Link href="/" className="brand">SHREEJI <b>LEARNER</b></Link><NotificationCenter/></header>
     <section className="portalContent" style={{maxWidth:1120}}>
       <div className="eyebrow">YOUR PERSONAL LEARNING SPACE</div>
       <h1>Welcome back, <em>{profile.full_name || user.email}</em></h1>

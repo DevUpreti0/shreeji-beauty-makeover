@@ -24,7 +24,7 @@ export async function GET(req:NextRequest){
  const profileIds=[...new Set((participants||[]).map(x=>x.user_id).concat((contacts||[]).map(x=>x.id)))];
  const {data:profiles}=profileIds.length?await db.from("profiles").select("id,full_name,role,avatar_url").in("id",profileIds):{data:[] as any[]};
  const profileMap=new Map((profiles||[]).map(p=>[p.id,p]));
- const chats=(conversations||[]).map(c=>{const other=(participants||[]).filter(p=>p.conversation_id===c.id&&p.user_id!==user.id).map(p=>profileMap.get(p.user_id)).filter(Boolean);const own=(memberships||[]).find(m=>m.conversation_id===c.id);return {...c,other:other[0]||null,unread:!!(own?.last_read_at&&new Date(c.updated_at)>new Date(own.last_read_at))};});
+ const chats=(conversations||[]).map(c=>{const other=(participants||[]).filter(p=>p.conversation_id===c.id&&p.user_id!==user.id).map(p=>profileMap.get(p.user_id)).filter(Boolean);const own=(memberships||[]).find(m=>m.conversation_id===c.id);return {...c,other:other[0]||null,unread:!!(c.last_message&&(!own?.last_read_at||new Date(c.updated_at)>new Date(own.last_read_at)))};});
  return NextResponse.json({chats,contacts:contacts||[]});
 }
 export async function POST(req:NextRequest){

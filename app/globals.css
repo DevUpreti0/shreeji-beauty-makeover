@@ -174,3 +174,51 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .meetProviderCover>span{width:23px;height:23px;display:grid;place-items:center;border-radius:7px;background:linear-gradient(135deg,#7169d5,#b18cff);font-size:15px}
 .meetProviderCover b{font-size:11px;letter-spacing:.4px}.meetProviderCover small{font-size:8px;letter-spacing:1.4px;color:#c7baff}
 @media(max-width:650px){.meetProviderCover{left:7px;bottom:7px;padding:6px 9px}.meetProviderCover b{font-size:10px}}
+
+
+/* PERFORMANCE PATCH — keep the glass look without expensive paint effects */
+@import url('') layer(perf);
+html{scroll-behavior:auto!important}
+body{background-attachment:scroll!important}
+body:before{display:none!important}
+.topbar,.portalHeader,.ownershipBanner,.sideNav,.panelDrawer,.courseCard,.portalPanel,.metricGrid>div,.portalMetrics>div,.dashPanel,.profileEditor,.authCard,.authModal,.floatingNote,.classPeople,.meetShell,.notice,.trustbar,.panelMenuTrigger{
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+.courseCard,.portalPanel,.metricGrid>div,.portalMetrics>div,.dashPanel,.profileEditor,.authCard,.authModal,.floatingNote,.classPeople,.meetShell{
+  box-shadow:0 8px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+.heroArt .artOrb,.heroArt .cardFront,.heroArt .cardBack,.floatingNote,.panelMenuTrigger{
+  animation:none!important;filter:none!important;
+}
+.courseCard,.portalPanel,.metricGrid>div,.portalMetrics>div,.portalContent,.section,.heroCopy,.authCard{
+  animation:none!important;filter:none!important;
+}
+button,a,.courseCard,.portalPanel,.profileEditor{
+  transition:transform .16s ease,background-color .16s ease,border-color .16s ease!important;
+}
+.courseCard:hover,.portalPanel:hover,.metricGrid>div:hover{transform:translateY(-2px)!important;box-shadow:0 12px 28px rgba(0,0,0,.24)!important}
+.panelDrawerShade{backdrop-filter:none!important;animation:none!important}
+.panelDrawer{animation:none!important;box-shadow:-12px 0 35px #0006!important}
+.modalShade{backdrop-filter:none!important}
+.meetFrame{box-shadow:none!important}
+.courseVisual{filter:none!important}
+@media(max-width:900px){
+  .heroArt{transform:none!important}
+  .courseCard,.portalPanel,.metricGrid>div,.portalMetrics>div{box-shadow:0 6px 18px rgba(0,0,0,.18)!important}
+}
+@media(max-width:680px), (hover:none) and (pointer:coarse){
+  html,body{background-attachment:scroll!important}
+  .topbar,.portalHeader,.ownershipBanner,.sideNav,.panelDrawer,.courseCard,.courseBody,.portalPanel,.portalMetrics>div,.metricGrid>div,.dashPanel,.profileEditor,.authCard,.authModal,.floatingNote,.classPeople,.meetShell,.notice,.trustbar,.panelMenuTrigger,.courseVisual label{
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  }
+  .courseCard,.courseBody,.portalPanel,.portalMetrics>div,.metricGrid>div,.dashPanel,.profileEditor,.authCard,.authModal,.floatingNote,.classPeople,.meetShell{
+    box-shadow:0 5px 16px rgba(0,0,0,.18)!important;
+  }
+  .panelMenuTrigger{animation:none!important}
+  .courseCard:hover,.portalPanel:hover,.metricGrid>div:hover{transform:none!important}
+  .primary:hover,.lightButton:hover{transform:none!important}
+  .heroArt .artOrb,.heroArt .cardFront,.heroArt .cardBack,.floatingNote{animation:none!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}

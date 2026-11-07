@@ -298,3 +298,34 @@ button,a,.courseCard,.portalPanel,.profileEditor{
 .teacherAnalyticsGrid span{font-size:10px;line-height:1.4;color:#b8c5db}
 @media(max-width:760px){.studentMilestones{grid-template-columns:1fr}.teacherAnalyticsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.teacherAnalyticsGrid{grid-template-columns:1fr 1fr}.teacherAnalyticsGrid>div{padding:11px}.teacherAnalyticsGrid strong{font-size:21px}}
+
+/* Teacher student management centre */
+.studentDirectoryMetrics{margin:0!important}
+.studentDirectoryFilters{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,.45fr);gap:10px;margin:20px 0 14px}
+.studentDirectoryFilters input,.studentDirectoryFilters select{width:100%;min-width:0;min-height:44px;padding:10px 13px;border:1px solid #8293b755;border-radius:11px;background:#101a2b;color:#f5f5ff;outline:none}
+.studentDirectoryList{display:grid;gap:7px}
+.studentDirectoryRow{display:flex;align-items:center;gap:12px;width:100%;padding:12px;text-align:left;border:1px solid #ffffff18;border-radius:13px;background:#ffffff05;color:inherit;cursor:pointer}
+.studentDirectoryRow:hover,.studentDirectoryRow.selected{border-color:#a99aff88;background:#8174d51a}
+.studentAvatar{width:42px;height:42px;flex-shrink:0;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:linear-gradient(135deg,#7668cf,#b08bd9);color:white;font-weight:800;font-size:15px}
+.studentAvatar img{width:100%;height:100%;object-fit:cover}
+.studentDirectoryIdentity{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.studentDirectoryIdentity b{font-size:13px;color:#f5f5ff}
+.studentDirectoryIdentity small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:#b8c5db}
+.studentDirectoryProgress{font-size:11px;font-weight:800;color:#c7baff;white-space:nowrap}
+.studentDirectoryArrow{font-size:22px;color:#b8c5db}
+.studentDirectoryCount{display:block;margin-top:12px;color:#aebbd1}
+.studentDirectoryEmpty{padding:22px 4px;color:#dce4f4}
+.studentDirectoryEmpty p{color:#aebbd1}
+.studentDetailPanel{border-color:#a99aff66!important}
+.studentDetailHead{display:flex;align-items:center;gap:14px;margin:18px 0}
+.studentAvatarLarge{width:60px;height:60px;font-size:22px}
+.studentDetailFacts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.studentDetailFacts>div{display:flex;flex-direction:column;gap:6px;min-width:0;padding:12px;border:1px solid #ffffff18;border-radius:11px;background:#ffffff06}
+.studentDetailFacts small{font-size:9px;letter-spacing:1px;color:#b9b0df}
+.studentDetailFacts b{font-size:11px;color:#f2f4ff;overflow-wrap:anywhere}
+.studentDetailCourse{display:grid;gap:9px;padding:13px 0;border-bottom:1px solid #ffffff18}
+.studentDetailCourse>div:first-child b{font-size:12px}
+.studentDetailCourse small{font-size:10px;color:#b8c5db}
+.studentProgressTrack{height:8px;border-radius:20px;background:#ffffff18;overflow:hidden}
+.studentProgressTrack span{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#756be0,#a98af2)}
+@media(max-width:650px){.studentDirectoryFilters{grid-template-columns:1fr}.studentDetailFacts{grid-template-columns:repeat(2,minmax(0,1fr))}.studentDirectoryRow{gap:9px;padding:10px}.studentAvatar{width:37px;height:37px}}

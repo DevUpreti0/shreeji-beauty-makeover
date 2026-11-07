@@ -2,6 +2,7 @@ import {redirect} from "next/navigation";
 import Link from "next/link";
 import {isAdminSessionValid,clearAdminSession,currentAdminIdentity} from "@/lib/admin-session";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
+import NotificationCenter from "@/app/components/notification-center";
 export const dynamic="force-dynamic";
 async function logout(){ "use server"; await clearAdminSession(); redirect("/login"); }
 const sections=[
@@ -42,7 +43,7 @@ export default async function AdminPage(){
   if(u.error||s.error||t.error||c.error||p.error||e.error||pa.error||sp.error||rc.error)throw new Error("Some dashboard data is unavailable. Check database policies and migrations.");
   counts={users:u.count||0,students:s.count||0,teachers:t.count||0,courses:c.count||0,published:p.count||0,enrollments:e.count||0,payments:pa.count||0,support:sp.count||0};recent=rc.data||[];
  }catch(err){error=err instanceof Error?err.message:"Dashboard data unavailable.";}
- return <main className="portalPage"><header className="portalHeader"><Link href="/" className="brand">SHREEJI <b>ADMIN</b></Link><Link href="/profile" className="outline">My profile</Link><form action={logout}><button className="outline">Sign out</button></form></header><section className="portalContent">
+ return <main className="portalPage"><header className="portalHeader"><Link href="/" className="brand">SHREEJI <b>ADMIN</b></Link><NotificationCenter/><Link href="/profile" className="outline">My profile</Link><form action={logout}><button className="outline">Sign out</button></form></header><section className="portalContent">
  <div className="eyebrow">OWNER CONTROL CENTER</div><h1>Platform <em>administration.</em></h1><p>Manage the learning platform from one place. Changes are protected by your admin account.</p>{error&&<p className="formMessage">{error}</p>}
  <div className="portalMetrics">{[["TOTAL USERS",counts.users],["STUDENTS",counts.students],["TEACHERS",counts.teachers],["COURSES",counts.courses],["PUBLISHED",counts.published],["ENROLLMENTS",counts.enrollments],["PAYMENTS",counts.payments],["OPEN SUPPORT",counts.support]].map(([label,value])=><div key={String(label)}><small>{label}</small><strong>{value}</strong></div>)}</div>
  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:14,marginTop:26}}>{sections.filter(s=>(s.href!=="/admin/super-admin"&&s.href!=="/admin/super-admin/audit")||identity?.isSuperAdmin).map(s=><Link key={s.href} href={s.href} className="portalPanel" style={{textDecoration:"none",color:"inherit",display:"block",minHeight:135}}><small style={{color:"#9a7655",letterSpacing:2}}>{s.icon} / CONTROL</small><h2 style={{margin:"10px 0 6px"}}>{s.title} ↗</h2><p style={{margin:0,fontSize:14,opacity:.75}}>{s.desc}</p></Link>)}</div>

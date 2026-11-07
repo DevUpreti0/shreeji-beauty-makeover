@@ -30,7 +30,7 @@ export default async function CertificatesPage(){
   const {data:existing}=await adminDb.from("certificates").select("id,certificate_number,issued_at").eq("student_id",user.id).eq("course_id",c.courseId).maybeSingle();
   if(existing){issuedCertificates.set(c.id,existing);continue;}
   const certificateNumber="SBM-"+crypto.randomUUID().replace(/-/g,"").slice(0,12).toUpperCase();
-  const {data:created}=await adminDb.from("certificates").insert({student_id:user.id,course_id:c.courseId,certificate_number}).select("id,certificate_number,issued_at").single();
+  const {data:created}=await adminDb.from("certificates").insert({student_id:user.id,course_id:c.courseId,certificate_number:certificateNumber}).select("id,certificate_number,issued_at").single();
   if(created)issuedCertificates.set(c.id,created);
   else {const {data:retry}=await adminDb.from("certificates").select("id,certificate_number,issued_at").eq("student_id",user.id).eq("course_id",c.courseId).maybeSingle();if(retry)issuedCertificates.set(c.id,retry);}
  }

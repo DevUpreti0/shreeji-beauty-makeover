@@ -1,8 +1,9 @@
-import Link from "next/link";import {redirect} from "next/navigation";import {createSupabaseServerClient} from "@/lib/supabase-server";import {formatIndiaDateTime} from "@/lib/datetime";
+import Link from "next/link";import {redirect} from "next/navigation";import {createSupabaseServerClient} from "@/lib/supabase-server";import {formatIndiaDateTime} from "@/lib/datetime";import {canAdminAccess} from "@/lib/admin-session";
 export const dynamic="force-dynamic";
 export default async function LiveClasses(){
  const db=await createSupabaseServerClient();const {data:{user}}=await db.auth.getUser();if(!user)redirect("/login");
  const {data:profile}=await db.from("profiles").select("role").eq("id",user.id).maybeSingle();
+ if(profile?.role==="admin"&&!await canAdminAccess("live-classes"))redirect("/admin");
  let query=db.from("live_classes").select("id,title,starts_at,duration_minutes,status,course_id,courses(title)").order("starts_at",{ascending:true}).limit(100);
  if(profile?.role==="teacher")query=query.eq("teacher_id",user.id);
  else if(profile?.role!=="admin"){

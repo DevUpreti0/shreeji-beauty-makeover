@@ -11,9 +11,9 @@ async function reply(formData:FormData){
  const conversationId=String(formData.get("conversation_id")||"");const body=String(formData.get("body")||"").trim();
  if(!conversationId||!body||body.length>5000)return;
  const auth=await createSupabaseServerClient();const {data:{user}}=await auth.auth.getUser();if(!user)redirect("/login");
- const db=createAdminDb();const {data:conversation}=await db.from("support_conversations").select("id").eq("id",conversationId).maybeSingle();if(!conversation)return;
+ const db=createAdminDb();const {data:conversation}=await db.from("support_conversations").select("id,user_id,subject").eq("id",conversationId).maybeSingle();if(!conversation)return;
  const {error}=await db.from("support_messages").insert({conversation_id:conversationId,sender_id:user.id,body});
- if(error)throw new Error("Could not send reply.");await db.from("support_conversations").update({updated_at:new Date().toISOString(),status:"pending"}).eq("id",conversationId);revalidatePath("/admin/support");
+ if(error)throw new Error("Could not send reply.");await db.from("support_conversations").update({updated_at:new Date().toISOString(),status:"pending"}).eq("id",conversationId);await db.from("user_notifications").insert({user_id:conversation.user_id,title:"New reply from Shreeji Support",body:body.slice(0,140),href:"/support?conversationId="+conversationId,kind:"support"});revalidatePath("/admin/support");
 }
 async function setStatus(formData:FormData){
  "use server";if(!await canAdminAccess("support",true))redirect("/admin");

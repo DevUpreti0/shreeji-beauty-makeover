@@ -6,6 +6,7 @@ export const dynamic="force-dynamic";
 async function logout(){ "use server"; await clearAdminSession(); redirect("/login"); }
 const sections=[
  {href:"/admin/users",title:"Users & roles",desc:"View accounts, assign student/teacher/admin roles.",icon:"01"},
+ {href:"/admin/super-admin",title:"Super Admin",desc:"Appoint administrators and control section-by-section view and edit permissions.",icon:"ROOT"},
  {href:"/admin/courses",title:"Course catalogue",desc:"Create courses, edit catalogue and publish or archive.",icon:"02"},
  {href:"/admin/assessments",title:"Quizzes & assessments",desc:"Build course assessments and review learner attempts.",icon:"02A"},
  {href:"/admin/enrollments",title:"Enrollments",desc:"Review learner access and manage enrollment status.",icon:"03"},

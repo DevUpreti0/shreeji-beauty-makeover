@@ -4,6 +4,7 @@ import {createSupabaseServerClient} from "@/lib/supabase-server";
 import TeacherPanel from "./teacher-panel";
 import TeacherToolkit from "./teacher-toolkit";
 import NotificationCenter from "@/app/components/notification-center";
+import {formatIndiaDateTime} from "@/lib/datetime";
 
 export const dynamic = "force-dynamic";
 
@@ -99,7 +100,7 @@ export default async function TeacherPage() {
         <p>Keep upcoming sessions close and open the classroom when it is time to teach.</p>
         {upcomingTeacherClasses.length ? <div style={{display:"grid",gap:10,marginTop:14}}>
           {upcomingTeacherClasses.map((item:any)=><article className="portalCourse" key={item.id}>
-            <div style={{flex:1,minWidth:180}}><b>{item.title}</b><span>{new Date(item.starts_at).toLocaleString("en-IN")} · {item.duration_minutes} minutes</span><small style={{display:"block",marginTop:6,color:item.status==="live"?"#8df0bf":"#c8bbff"}}>{item.status==="live"?"● LIVE NOW":item.status.toUpperCase()}</small></div>
+            <div style={{flex:1,minWidth:180}}><b>{item.title}</b><span>{formatIndiaDateTime(item.starts_at)} · {item.duration_minutes} minutes</span><small style={{display:"block",marginTop:6,color:item.status==="live"?"#8df0bf":"#c8bbff"}}>{item.status==="live"?"● LIVE NOW":item.status.toUpperCase()}</small></div>
             <Link className="primary inlineButton" href={"/live-classes/"+item.id}>{item.status==="live"?"Open classroom ↗":"View class ↗"}</Link>
           </article>)}
         </div>:<p style={{marginTop:14}}>No upcoming classes. Schedule your next DuKu Meet session to see it here.</p>}

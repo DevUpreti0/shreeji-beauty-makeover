@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {redirect} from "next/navigation";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
+import StudyPlanner from "./study-planner";
 
 export const dynamic = "force-dynamic";
 
@@ -81,6 +82,8 @@ export default async function StudentPage() {
           <div style={{height:"100%",width:overall+"%",background:"linear-gradient(90deg,#b98a61,#e3c39b)",borderRadius:20,transition:"width .4s"}} />
         </div>
       </div>
+
+      <StudyPlanner />
 
       <section className="portalPanel studentNextStep" style={{marginBottom:22}}>
         <div className="eyebrow" style={{marginBottom:8}}>YOUR NEXT MILESTONE</div>

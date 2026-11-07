@@ -10,6 +10,7 @@ const sections=[
  {href:"/admin/assessments",title:"Quizzes & assessments",desc:"Build course assessments and review learner attempts.",icon:"02A"},
  {href:"/admin/enrollments",title:"Enrollments",desc:"Review learner access and manage enrollment status.",icon:"03"},
  {href:"/admin/payments",title:"Payments",desc:"Review payment records, amounts and payment states.",icon:"04"},
+ {href:"/admin/coupons",title:"Coupons & discounts",desc:"Generate free-course codes, percentage offers and fixed discounts.",icon:"04A"},
  {href:"/admin/live-classes",title:"Live classes",desc:"Schedule and host DuKu Meet classrooms, manage sessions and review attendance.",icon:"05"},
  {href:"/admin/support",title:"Live support inbox",desc:"Read support conversations, reply and close tickets.",icon:"07"},
  {href:"/admin/settings",title:"Platform settings",desc:"Configure payment mode, meeting provider and support contact.",icon:"06"},

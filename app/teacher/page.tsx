@@ -3,6 +3,7 @@ import {redirect} from "next/navigation";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
 import TeacherPanel from "./teacher-panel";
 import TeacherToolkit from "./teacher-toolkit";
+import NotificationCenter from "@/app/components/notification-center";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +54,7 @@ export default async function TeacherPage() {
     <header className="portalHeader">
       <Link href="/" className="brand">SHREEJI <b>TEACHER</b></Link>
       <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
+        <NotificationCenter/>
         <Link href="/profile" className="outline">My profile</Link>
         <form action="/auth/signout" method="post"><button className="outline">Sign out</button></form>
       </div>

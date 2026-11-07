@@ -30,12 +30,14 @@ export async function GET(req:NextRequest){
  const {data:profiles}=profileIds.length?await db.from("profiles").select("id,full_name,role,avatar_url").in("id",profileIds):{data:[] as any[]};
  const profileMap=new Map((profiles||[]).map(p=>[p.id,p]));
  const chats=(conversations||[]).map(c=>{const members=(participants||[]).filter(p=>p.conversation_id===c.id&&p.user_id!==user.id).map(p=>profileMap.get(p.user_id)).filter(Boolean);const own=(memberships||[]).find(m=>m.conversation_id===c.id);return {...c,other:members[0]||null,members,unread:!!(c.last_message&&(!own?.last_read_at||new Date(c.updated_at)>new Date(own.last_read_at)))};});
- const online=new Set((presence||[]).map(p=>p.user_id));\n return NextResponse.json({chats,contacts:(contacts||[]).map(p=>({...p,online:online.has(p.id)}))});
+ const online=new Set((presence||[]).map(p=>p.user_id));
+ return NextResponse.json({chats,contacts:(contacts||[]).map(p=>({...p,online:online.has(p.id)}))});
 }
 export async function POST(req:NextRequest){
  const ctx=await context();if(!ctx)return NextResponse.json({error:"Sign in required."},{status:401});
  const {user,db}=ctx;let body:any;try{body=await req.json()}catch{return NextResponse.json({error:"Invalid request."},{status:400})}
- const action=String(body.action||"");\n if(action==="presence"){const {error}=await db.from("chat_presence").upsert({user_id:user.id,last_seen_at:new Date().toISOString()});return NextResponse.json({ok:!error},{status:error?500:200});}
+ const action=String(body.action||"");
+ if(action==="presence"){const {error}=await db.from("chat_presence").upsert({user_id:user.id,last_seen_at:new Date().toISOString()});return NextResponse.json({ok:!error},{status:error?500:200});}
  if(action==="start"||action==="start-group"){
   const isGroup=action==="start-group";const targets=isGroup?Array.from(new Set((Array.isArray(body.targetIds)?body.targetIds:[]).map((x:any)=>String(x)).filter((x:string)=>x&&x!==user.id))):[String(body.targetId||"")];
   if((isGroup&&(targets.length<2||targets.length>25))||(!isGroup&&(!targets[0]||targets[0]===user.id)))return NextResponse.json({error:isGroup?"Choose between 2 and 25 other people.":"Choose another user."},{status:400});

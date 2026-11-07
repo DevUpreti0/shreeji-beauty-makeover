@@ -72,7 +72,7 @@ export default async function StudentPage() {
       <div className="eyebrow">YOUR PERSONAL LEARNING SPACE</div>
       <h1>Welcome back, <em>{profile.full_name || user.email}</em></h1>
       <p>Pick up where you left off and keep building your skills.</p>
-      <p><Link className="primary inlineButton" href="/live-classes">Join live course classes ↗</Link></p>
+      <p style={{display:"flex",gap:10,flexWrap:"wrap"}}><Link className="primary inlineButton" href="/live-classes">Join live course classes ↗</Link><Link className="outline" href="/student/live-classes/attendance">My attendance report ↗</Link></p>
 
       <div className="portalMetrics" style={{margin:"26px 0"}}>
         <div><small>MY COURSES</small><strong>{courseStats.length}</strong></div>

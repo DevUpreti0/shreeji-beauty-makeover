@@ -222,3 +222,19 @@ button,a,.courseCard,.portalPanel,.profileEditor{
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
+
+/* Homepage: enforced premium dark theme, regardless of CMS light settings */
+.homepage-dark{--ink:#f4efe6!important;--muted:#aaa39a!important;--cream:#0b0d10!important;--rose:#c6a56a!important;--line:#292b30!important;background:#0b0d10!important;color:#f4efe6!important;min-height:100vh;color-scheme:dark}
+.homepage-dark .topbar{background:#101216!important;border-bottom:1px solid #292b30!important;color:#f4efe6!important}
+.homepage-dark .brand,.homepage-dark .login{color:#f4efe6!important}.homepage-dark .brand small{color:#b9a47b!important}.homepage-dark .brandmark{background:#28251e!important;color:#d8bd82!important}
+.homepage-dark .topbar nav button{color:#b8b2a8!important}.homepage-dark .topbar nav button.active,.homepage-dark .topbar nav button:hover{color:#dfc48c!important}.homepage-dark .topbar nav.open{background:#101216!important}
+.homepage-dark .section.coursePage{background:#0b0d10!important;color:#f4efe6!important}.homepage-dark .eyebrow{color:#d4b77a!important}.homepage-dark .section h2{color:#f5f0e8!important}
+.homepage-dark .filters input,.homepage-dark .filters select{background:#15181d!important;color:#f4efe6!important;border:1px solid #36383d!important;color-scheme:dark}.homepage-dark .filters input::placeholder{color:#898b91!important}
+.homepage-dark .courseCard{background:#14171b!important;border:1px solid #303238!important;box-shadow:none!important}.homepage-dark .courseCard:hover{border-color:#8d774c!important;box-shadow:0 16px 38px #0008!important}
+.homepage-dark .courseBody h3{color:#f4efe6!important}.homepage-dark .courseBody p{color:#aaa7a1!important}.homepage-dark .courseMeta{color:#c6ad7b!important}.homepage-dark .courseBottom{border-color:#303238!important}.homepage-dark .courseBottom strong{color:#f5efe4!important}.homepage-dark .courseBottom button{color:#dfc48c!important}
+.homepage-dark .courseVisual label{background:#24221d!important;color:#e0c68f!important}.homepage-dark .primary{background:#b3945c!important;border-color:#b3945c!important;color:#101114!important}.homepage-dark .primary:hover{background:#d0b477!important}
+.homepage-dark .notice{background:#191c21!important;color:#f4efe6!important;border-color:#383a40!important}.homepage-dark .notice button{color:#f4efe6!important}
+.homepage-dark .modalShade{background:#000c!important}.homepage-dark .authModal{background:#15181d!important;color:#f4efe6!important;border:1px solid #383a40!important}.homepage-dark .authModal h2{color:#f4efe6!important}
+.homepage-dark .authModal>p,.homepage-dark .authNote{color:#aaa7a1!important}.homepage-dark .authModal input,.homepage-dark .authModal select{background:#0e1014!important;color:#f4efe6!important;border-color:#383a40!important;color-scheme:dark}
+.homepage-dark .authModal label{color:#c6bda9!important}.homepage-dark .authModal .close{color:#e8dfd0!important}.homepage-dark .switchAuth{color:#dfc48c!important}.homepage-dark .courseModal .courseMeta strong{color:#f4efe6!important}
+@media(max-width:680px){.homepage-dark .topbar nav.open{background:#101216!important;border-top:1px solid #292b30!important}.homepage-dark .mobileMenu{color:#f4efe6!important}}

@@ -14,7 +14,7 @@ async function createQuiz(formData:FormData){
  if(error)throw new Error("Quiz could not be saved. Check the assessment migration and course.");revalidatePath("/admin/assessments");
 }
 async function publishQuiz(formData:FormData){
- "use server";if(!await canAdminAccess("assessments"))redirect("/admin");
+ "use server";if(!await canAdminAccess("assessments",true))redirect("/admin");
  const id=String(formData.get("quiz_id")||"");const published=String(formData.get("published")||"")==="true";if(!id)return;
  const {error}=await createAdminDb().from("course_quizzes").update({is_published:published,updated_at:new Date().toISOString()}).eq("id",id);if(error)throw new Error("Could not update quiz publication.");revalidatePath("/admin/assessments");
 }

@@ -18,7 +18,24 @@ export default async function TeacherPage() {
   const {data:enrollments} = courseIds.length
     ? await sb.from("enrollments").select("id,course_id,status").in("course_id",courseIds)
     : {data:[] as any[]};
-  const {data:classes} = await sb.from("live_classes").select("id,status").eq("teacher_id",user.id);
+  const {data:classes} = await sb.from("live_classes").select("id,title,starts_at,duration_minutes,status").eq("teacher_id",user.id).order("starts_at",{ascending:true}).limit(10);
+  const {data:modules} = courseIds.length
+    ? await sb.from("modules").select("id,course_id").in("course_id",courseIds)
+    : {data:[] as any[]};
+  const moduleIds=(modules||[]).map((m:any)=>m.id);
+  const {data:lessons} = moduleIds.length
+    ? await sb.from("lessons").select("id,module_id").in("module_id",moduleIds)
+    : {data:[] as any[]};
+  const lessonIds=(lessons||[]).map((l:any)=>l.id);
+  const {data:lessonProgress} = lessonIds.length
+    ? await sb.from("lesson_progress").select("lesson_id,completed").in("lesson_id",lessonIds)
+    : {data:[] as any[]};
+  const totalLessons=lessonIds.length;
+  const completedLessonRecords=(lessonProgress||[]).filter((p:any)=>p.completed).length;
+  const lessonCompletions=(lessonProgress||[]).length;
+  const completionRate=lessonCompletions?Math.round(completedLessonRecords/lessonCompletions*100):0;
+  const upcomingTeacherClasses=(classes||[]).filter((c:any)=>new Date(c.starts_at).getTime()>=Date.now()-2*60*60*1000).slice(0,5);
+
   const activeLearners = (enrollments || []).filter((e:any) => ["active","paid","completed"].includes(e.status)).length;
   const publishedCourses = courseList.filter((c:any) => c.status === "published").length;
   const liveClasses = (classes || []).filter((c:any) => c.status === "live").length;
@@ -42,7 +59,38 @@ export default async function TeacherPage() {
         <div><small>PUBLISHED COURSES</small><strong>{publishedCourses}</strong></div>
         <div><small>ENROLLED LEARNERS</small><strong>{activeLearners}</strong></div>
         <div><small>LIVE CLASSES NOW</small><strong>{liveClasses}</strong></div>
+        <div><small>COURSE LESSONS</small><strong>{totalLessons}</strong></div>
+        <div><small>LESSON COMPLETION</small><strong>{completionRate}%</strong></div>
       </div>
+
+      <section className="portalPanel teacherAnalytics" style={{marginBottom:20}}>
+        <div className="eyebrow" style={{marginBottom:8}}>TEACHER ANALYTICS</div>
+        <h2 style={{marginTop:0}}>Learning performance</h2>
+        <p>Track course content and learner activity across your teaching catalogue.</p>
+        <div className="teacherAnalyticsGrid">
+          <div><small>ACTIVE ENROLLMENTS</small><strong>{activeLearners}</strong><span>Across all your courses</span></div>
+          <div><small>LESSON COMPLETIONS</small><strong>{completedLessonRecords}</strong><span>Completed lesson records</span></div>
+          <div><small>LEARNING ACTIVITY</small><strong>{lessonCompletions}</strong><span>Progress records received</span></div>
+          <div><small>CONTENT COVERAGE</small><strong>{totalLessons}</strong><span>Lessons published in your modules</span></div>
+        </div>
+        <div style={{marginTop:18}}>
+          <div style={{display:"flex",justifyContent:"space-between",gap:10,marginBottom:8,fontSize:12}}><b>Completion rate across recorded activity</b><strong>{completionRate}%</strong></div>
+          <div style={{height:9,borderRadius:20,background:"#ffffff18",overflow:"hidden"}}><div style={{height:"100%",width:completionRate+"%",borderRadius:20,background:"linear-gradient(90deg,#756be0,#a98af2)"}}/></div>
+          <small style={{display:"block",marginTop:8,color:"#b9c5da"}}>Calculated from lesson progress records visible to your teacher account.</small>
+        </div>
+      </section>
+
+      <section className="portalPanel" style={{marginBottom:20}}>
+        <div className="eyebrow" style={{marginBottom:8}}>DUKU MEET PLANNER</div>
+        <h2 style={{marginTop:0}}>Your class schedule</h2>
+        <p>Keep upcoming sessions close and open the classroom when it is time to teach.</p>
+        {upcomingTeacherClasses.length ? <div style={{display:"grid",gap:10,marginTop:14}}>
+          {upcomingTeacherClasses.map((item:any)=><article className="portalCourse" key={item.id}>
+            <div style={{flex:1,minWidth:180}}><b>{item.title}</b><span>{new Date(item.starts_at).toLocaleString("en-IN")} · {item.duration_minutes} minutes</span><small style={{display:"block",marginTop:6,color:item.status==="live"?"#8df0bf":"#c8bbff"}}>{item.status==="live"?"● LIVE NOW":item.status.toUpperCase()}</small></div>
+            <Link className="primary inlineButton" href={"/live-classes/"+item.id}>{item.status==="live"?"Open classroom ↗":"View class ↗"}</Link>
+          </article>)}
+        </div>:<p style={{marginTop:14}}>No upcoming classes. Schedule your next DuKu Meet session to see it here.</p>}
+      </section>
 
       <section className="portalPanel" style={{marginBottom:20}}>
         <div className="eyebrow" style={{marginBottom:8}}>TEACHER QUICK ACTIONS</div>

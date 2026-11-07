@@ -1,0 +1,21 @@
+"use client";
+import {useEffect,useState} from "react";
+type Admin={id:string;full_name:string;email:string;isSuperAdmin:boolean;permissions:{section_key:string;can_view:boolean;can_edit:boolean}[]};
+const labels:Record<string,string>={users:"Users & roles",courses:"Courses",assessments:"Assessments",enrollments:"Enrollments",payments:"Payments",coupons:"Coupons", "live-classes":"Live classes",support:"Support inbox",settings:"Platform settings",website:"Website editor"};
+export default function SuperAdminManager(){
+ const [admins,setAdmins]=useState<Admin[]>([]),[sections,setSections]=useState<string[]>([]),[loading,setLoading]=useState(true),[busy,setBusy]=useState(""),[message,setMessage]=useState(""),[email,setEmail]=useState("");
+ async function load(){setLoading(true);try{const r=await fetch("/api/super-admin/admins",{cache:"no-store"});const d=await r.json();if(!r.ok)throw Error(d.error);setAdmins(d.admins||[]);setSections(d.sections||[]);}catch(e:any){setMessage(e.message||"Unable to load admins.");}finally{setLoading(false);}}
+ useEffect(()=>{load();},[]);
+ async function action(adminId:string,body:any){setBusy(adminId+(body.section||body.action));setMessage("");try{const r=await fetch("/api/super-admin/admins",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({adminId,...body})});const d=await r.json();if(!r.ok)throw Error(d.error);setMessage("Administrator access updated.");await load();}catch(e:any){setMessage(e.message||"Update failed.");}finally{setBusy("");}}
+ const appoint=async()=>{const target=admins.find(a=>a.email.toLowerCase()===email.trim().toLowerCase());if(!target){setMessage("Account not found. The user must register first.");return;}await action(target.id,{action:"appoint"});setEmail("");};
+ return <div style={{display:"grid",gap:16,marginTop:24}}>
+  <section className="portalPanel"><div className="eyebrow">ADMIN APPOINTMENTS</div><h2 style={{margin:"6px 0"}}>Appoint an administrator</h2><p>Enter the registered account email. The person must already have a Shreeji account.</p><div className="superAdminAppoint"><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Registered email address"/><button className="primary inlineButton" type="button" disabled={!email.trim()||!!busy} onClick={appoint}>Appoint admin</button></div></section>
+  <section className="portalPanel"><div className="eyebrow">ADMIN ACCESS CONTROL</div><h2 style={{margin:"6px 0"}}>Administrators & permissions</h2><p>Enable view and edit separately for every section. An administrator without permission cannot open that section.</p>
+   {loading?<p>Loading administrator accounts…</p>:admins.map(a=><article key={a.id} className="superAdminCard"><div className="superAdminIdentity"><b>{a.full_name||"Admin account"}</b><small>{a.email}</small>{a.isSuperAdmin&&<span className="meetLivePill isLive">OWNER · SUPER ADMIN</span>}</div>
+    {a.isSuperAdmin?<p className="superAdminLocked">Full access to every section. Owner permissions cannot be changed here.</p>:<><div className="superAdminPermissionGrid">{sections.map(section=>{const perm=a.permissions.find(p=>p.section_key===section);const view=!!perm?.can_view,edit=!!perm?.can_edit;return <div className="superAdminPermission" key={section}><b>{labels[section]||section}</b><label><input type="checkbox" checked={view} disabled={!!busy} onChange={e=>action(a.id,{action:"permission",section,canView:e.target.checked,canEdit:e.target.checked?edit:false})}/> View</label><label><input type="checkbox" checked={edit} disabled={!view||!!busy} onChange={e=>action(a.id,{action:"permission",section,canView:true,canEdit:e.target.checked})}/> Edit</label></div>})}</div><button className="outline" type="button" disabled={!!busy} onClick={()=>action(a.id,{action:"remove"})}>Remove admin access</button></>}
+   </article>)}
+   {!loading&&!admins.length&&<p>No administrator accounts found.</p>}
+  </section>
+  {message&&<p role="status" className="formMessage">{message}</p>}
+ </div>;
+}

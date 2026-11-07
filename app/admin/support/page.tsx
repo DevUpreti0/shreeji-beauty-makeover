@@ -7,7 +7,7 @@ import {createSupabaseServerClient} from "@/lib/supabase-server";
 import SupportRealtimeRefresh from "./realtime-refresh";
 export const dynamic="force-dynamic";
 async function reply(formData:FormData){
- "use server";if(!await canAdminAccess("support"))redirect("/admin");
+ "use server";if(!await canAdminAccess("support",true))redirect("/admin");
  const conversationId=String(formData.get("conversation_id")||"");const body=String(formData.get("body")||"").trim();
  if(!conversationId||!body||body.length>5000)return;
  const auth=await createSupabaseServerClient();const {data:{user}}=await auth.auth.getUser();if(!user)redirect("/login");
@@ -16,7 +16,7 @@ async function reply(formData:FormData){
  if(error)throw new Error("Could not send reply.");await db.from("support_conversations").update({updated_at:new Date().toISOString(),status:"pending"}).eq("id",conversationId);revalidatePath("/admin/support");
 }
 async function setStatus(formData:FormData){
- "use server";if(!await canAdminAccess("support"))redirect("/admin");
+ "use server";if(!await canAdminAccess("support",true))redirect("/admin");
  const id=String(formData.get("conversation_id")||"");const status=String(formData.get("status")||"");
  if(!id||!["open","pending","closed"].includes(status))return;
  const {error}=await createAdminDb().from("support_conversations").update({status,updated_at:new Date().toISOString()}).eq("id",id);

@@ -44,6 +44,7 @@ export default async function StudentPage() {
     <header className="portalHeader">
       <Link href="/" className="brand">SHREEJI <b>LEARNER</b></Link>
       <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
+        <Link href="/student/receipts" className="outline">My receipts</Link>
         <Link href="/profile" className="outline">My profile</Link>
         <form action="/auth/signout" method="post"><button className="outline">Sign out</button></form>
       </div>

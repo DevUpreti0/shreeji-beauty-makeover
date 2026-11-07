@@ -18,6 +18,8 @@ export async function POST(req:NextRequest){
   const score=Math.round(correct/quiz.questions.length*100);const passed=score>=Number(quiz.passing_score||0);
   const {data:attempt,error:insertError}=await db.from("quiz_attempts").insert({quiz_id:quiz.id,student_id:user.id,answers:sanitized,score,passed,submitted_at:new Date().toISOString()}).select("id").single();
   if(insertError)throw insertError;
+  await db.from("user_notifications").insert({user_id:user.id,title:passed?"Quiz passed!":"Quiz result ready",body:"You scored "+score+"% ("+correct+"/"+quiz.questions.length+"). "+(passed?"Great work!":"Review your lessons and try again."),href:"/student/quizzes",kind:"quiz"});
+  const {data:course}=await db.from("courses").select("teacher_id").eq("id",quiz.course_id).maybeSingle();if(course?.teacher_id)await db.from("user_notifications").insert({user_id:course.teacher_id,title:"Student completed a quiz",body:"A learner has submitted a course quiz. Open quiz results to review performance.",href:"/teacher/quiz-results",kind:"quiz"});
   return NextResponse.json({attemptId:attempt.id,score,correct,total:quiz.questions.length,passed});
  }catch(error){console.error("Quiz submission failed",error);return NextResponse.json({error:"Quiz submission failed. Please try again."},{status:500});}
 }

@@ -10,11 +10,13 @@ export async function POST(req:NextRequest){
   if(!assignmentId||submissionText.length>5000||attachmentUrl.length>1000||(!submissionText&&!attachmentUrl))return NextResponse.json({error:"Add your written answer or a file link."},{status:400});
   if(attachmentUrl){let url:URL;try{url=new URL(attachmentUrl);}catch{return NextResponse.json({error:"Enter a valid attachment link."},{status:400});}if(url.protocol!=="https:")return NextResponse.json({error:"Attachment links must use HTTPS."},{status:400});}
   const db=createAdminDb();const {data:assignment}=await db.from("course_assignments").select("id,course_id,due_at").eq("id",assignmentId).maybeSingle();if(!assignment)return NextResponse.json({error:"Assignment not found."},{status:404});
+  const {data:course}=await db.from("courses").select("teacher_id,title").eq("id",assignment.course_id).maybeSingle();
   const {data:enrollment}=await db.from("enrollments").select("id").eq("student_id",user.id).eq("course_id",assignment.course_id).eq("status","active").maybeSingle();if(!enrollment)return NextResponse.json({error:"You need an active course enrollment."},{status:403});
   const {data:existing}=await db.from("assignment_submissions").select("id,status").eq("assignment_id",assignmentId).eq("student_id",user.id).maybeSingle();
   if(existing?.status==="graded")return NextResponse.json({error:"This submission has already been graded."},{status:409});
   const payload={assignment_id:assignmentId,student_id:user.id,submission_text:submissionText,attachment_url:attachmentUrl||null,status:"submitted",grade:null,feedback:null,graded_by:null,graded_at:null,submitted_at:new Date().toISOString()};
   const {error}=await db.from("assignment_submissions").upsert(payload,{onConflict:"assignment_id,student_id"});if(error)throw error;
+  if(course?.teacher_id)await db.from("user_notifications").insert({user_id:course.teacher_id,title:"New assignment submission",body:"A learner submitted work for review.",href:"/teacher/assignments",kind:"submission"});
   return NextResponse.json({ok:true,late:!!assignment.due_at&&new Date(assignment.due_at).getTime()<Date.now()});
  }catch(e){console.error("Assignment submission failed",e);return NextResponse.json({error:"Could not submit assignment."},{status:500});}
 }

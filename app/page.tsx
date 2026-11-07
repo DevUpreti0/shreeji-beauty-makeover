@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { createClient as createSupabaseClient } from "@/lib/supabase/client";\nimport DukuAiSupport from "@/app/components/duku-ai-support";
+import { createClient as createSupabaseClient } from "@/lib/supabase/client";
+import DukuAiSupport from "@/app/components/duku-ai-support";
 type Course={id:number|string;title:string;category:string;level:string;duration:string;price:string;rating:string;desc:string;tag:string;};
 const courses:Course[]=[
 {id:1,title:"Professional Makeup Artist",category:"Makeup",level:"Beginner to Pro",duration:"8 weeks",price:"₹4,999",rating:"4.9",desc:"Build a strong foundation in skin prep, base makeup, eye looks and professional client-ready finishes.",tag:"Bestseller"},

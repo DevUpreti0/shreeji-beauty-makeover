@@ -111,7 +111,7 @@ export default async function TeacherPage() {
         <h2 style={{marginTop:0}}>Your teaching tools</h2>
         <p>Open your course studio to create modules, add lessons and upload private class videos. You can also schedule live sessions for your learners.</p>
         <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-          <Link className="primary inlineButton" href="/teacher/live-classes">Schedule a live class ↗</Link>
+          <Link className="primary inlineButton" href="/teacher/live-classes">Schedule a live class ↗</Link>\n          <Link className="outline" href="/teacher/live-classes/attendance">Class attendance reports ↗</Link>
           <Link className="outline" href="/teacher/students">Manage students ↗</Link>
           <Link className="outline" href="/chat">DuKu Chat ↗</Link>
           <Link className="outline" href="/teacher/assignments">Assignments & grading ↗</Link>

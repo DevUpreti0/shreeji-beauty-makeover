@@ -49,7 +49,7 @@ export default function MeetingRoom({roomName,displayName,classId,isHost=false}:
    <button type="button" className="meetControl" onClick={()=>command("toggleChat")}>▤<span>Chat</span></button>
    <button type="button" className="meetControl" onClick={()=>command("toggleParticipantsPane")}>♙<span>People</span></button>
    {isHost&&<button type="button" className="meetControl" onClick={()=>command("muteEveryone")}>🔇<span>Mute all</span></button>}
-   {isHost&&<button type="button" className="meetControl" onClick={()=>command("toggleSecurity")}>♙<span>Security</span></button>
+   {isHost&&<button type="button" className="meetControl" onClick={()=>command("toggleSecurity")}>♙<span>Security</span></button>}
    <button type="button" className="meetControl" onClick={()=>command("toggleShareScreen")}>▧<span>Share screen</span></button>
    <button type="button" className="meetControl" onClick={()=>command("toggleRaiseHand")}>✋<span>Raise hand</span></button>
    <button type="button" className="meetControl" onClick={()=>command("toggleTileView")}>▦<span>Tiles</span></button>

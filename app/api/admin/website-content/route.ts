@@ -1,12 +1,12 @@
 import {NextRequest,NextResponse} from "next/server";
-import {isAdminSessionValid} from "@/lib/admin-session";
+import {canAdminAccess} from "@/lib/admin-session";
 import {createAdminDb} from "@/lib/supabase/admin";
 import {revalidatePath} from "next/cache";
 export const runtime="nodejs";
 const maxText=(v:any,n:number)=>String(v??"").trim().slice(0,n);
 const safeLink=(v:any)=>{const s=maxText(v,500);return /^(https?:\/\/|\/|#|mailto:)/i.test(s)?s:"";};
 export async function PUT(req:NextRequest){
- if(!await isAdminSessionValid())return NextResponse.json({error:"Admin access required."},{status:401});
+ if(!await canAdminAccess("website"))return NextResponse.json({error:"Admin access required."},{status:401});
  try{
   const b=await req.json();
   const pages=Array.isArray(b.pages)?b.pages.slice(0,30).map((p:any)=>({id:maxText(p.id,80),slug:maxText(p.slug,70).toLowerCase().replace(/[^a-z0-9-]/g,"-").replace(/^-|-$/g,""),title:maxText(p.title,120),description:maxText(p.description,500),body:maxText(p.body,12000),imageUrl:maxText(p.imageUrl,1000),published:p.published===true})).filter((p:any)=>p.slug&&p.title):[];

@@ -55,6 +55,7 @@ export default async function TeacherPage() {
       <Link href="/" className="brand">SHREEJI <b>TEACHER</b></Link>
       <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
         <NotificationCenter/>
+        <Link href="/chat" className="outline">DuKu Chat</Link>
         <Link href="/profile" className="outline">My profile</Link>
         <form action="/auth/signout" method="post"><button className="outline">Sign out</button></form>
       </div>
@@ -111,6 +112,7 @@ export default async function TeacherPage() {
         <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
           <Link className="primary inlineButton" href="/teacher/live-classes">Schedule a live class ↗</Link>
           <Link className="outline" href="/teacher/students">Manage students ↗</Link>
+          <Link className="outline" href="/chat">DuKu Chat ↗</Link>
           <Link className="outline" href="/teacher/assignments">Assignments & grading ↗</Link>
           <Link className="outline" href="/teacher/quiz-results">Quiz results ↗</Link>
           <Link className="outline" href="/live-classes">Open classrooms</Link>

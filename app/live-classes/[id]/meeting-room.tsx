@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState} from "react";
 declare global {interface Window {JitsiMeetExternalAPI?:new(domain:string,options:any)=>MeetingApi}}
 type MeetingApi={dispose:()=>void;addListener:(event:string,callback:(data?:any)=>void)=>void;executeCommand?:(name:string,...args:any[])=>void};
-export default function MeetingRoom({roomName,displayName,classId}:{roomName:string;displayName:string;classId:string}){
+export default function MeetingRoom({roomName,displayName,classId,isHost=false}:{roomName:string;displayName:string;classId:string;isHost?:boolean}){
  const target=useRef<HTMLDivElement>(null),apiRef=useRef<MeetingApi|null>(null),joinedAt=useRef<number|null>(null);
  const [connection,setConnection]=useState("Preparing your classroom…"),[joined,setJoined]=useState(false),[participants,setParticipants]=useState(0),[audioMuted,setAudioMuted]=useState(true),[videoMuted,setVideoMuted]=useState(true),[elapsed,setElapsed]=useState(0),[attempt,setAttempt]=useState(0),[loadError,setLoadError]=useState("");
  const command=(name:string)=>apiRef.current?.executeCommand?.(name);
@@ -47,6 +47,9 @@ export default function MeetingRoom({roomName,displayName,classId}:{roomName:str
    <button type="button" className={"meetControl "+(audioMuted?"isMuted":"")} onClick={()=>command("toggleAudio")} aria-label={audioMuted?"Unmute microphone":"Mute microphone"}>🎙️<span>{audioMuted?"Unmute":"Mute"}</span></button>
    <button type="button" className={"meetControl "+(videoMuted?"isMuted":"")} onClick={()=>command("toggleVideo")} aria-label={videoMuted?"Turn camera on":"Turn camera off"}>▣<span>{videoMuted?"Camera on":"Camera off"}</span></button>
    <button type="button" className="meetControl" onClick={()=>command("toggleChat")}>▤<span>Chat</span></button>
+   <button type="button" className="meetControl" onClick={()=>command("toggleParticipantsPane")}>♙<span>People</span></button>
+   {isHost&&<button type="button" className="meetControl" onClick={()=>command("muteEveryone")}>🔇<span>Mute all</span></button>}
+   {isHost&&<button type="button" className="meetControl" onClick={()=>command("toggleSecurity")}>♙<span>Security</span></button>
    <button type="button" className="meetControl" onClick={()=>command("toggleShareScreen")}>▧<span>Share screen</span></button>
    <button type="button" className="meetControl" onClick={()=>command("toggleRaiseHand")}>✋<span>Raise hand</span></button>
    <button type="button" className="meetControl" onClick={()=>command("toggleTileView")}>▦<span>Tiles</span></button>
@@ -56,6 +59,6 @@ export default function MeetingRoom({roomName,displayName,classId}:{roomName:str
   </div></div>
   {loadError&&<div role="alert" className="formMessage" style={{margin:"10px 0"}}>{loadError} <button type="button" className="outline" onClick={()=>{setLoadError("");setConnection("Retrying meeting connection…");setAttempt(x=>x+1);}}>Retry connection</button></div>}
   <div className="meetFrame"><div ref={target} className="meetFrameInner"/><div className="meetProviderCover" aria-hidden="true"><span>✦</span><div><b>DuKu Meet</b><small>BY DUKU BUSINESS FCA LAB</small></div></div></div>
-  <div className="meetBottomBar"><span><i/> Course classroom · attendance tracking enabled</span><span>Use Devices to select your microphone, camera and speakers. Use Share screen for demonstrations.</span></div>
+  <div className="meetBottomBar"><span><i/> Course classroom · attendance tracking enabled</span><span>{isHost?"Host tools: mute all participants and open meeting security options. ":"Use Raise hand to request to speak. "}Use Devices to select your microphone, camera and speakers. Use Share screen for demonstrations.</span></div>
  </section>;
 }

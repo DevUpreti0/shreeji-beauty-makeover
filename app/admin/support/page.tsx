@@ -1,13 +1,13 @@
 import Link from "next/link";
 import {redirect} from "next/navigation";
 import {revalidatePath} from "next/cache";
-import {isAdminSessionValid} from "@/lib/admin-session";
+import {canAdminAccess} from "@/lib/admin-session";
 import {createAdminDb} from "@/lib/supabase/admin";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
 import SupportRealtimeRefresh from "./realtime-refresh";
 export const dynamic="force-dynamic";
 async function reply(formData:FormData){
- "use server";if(!await isAdminSessionValid())redirect("/login");
+ "use server";if(!await canAdminAccess("support"))redirect("/admin");
  const conversationId=String(formData.get("conversation_id")||"");const body=String(formData.get("body")||"").trim();
  if(!conversationId||!body||body.length>5000)return;
  const auth=await createSupabaseServerClient();const {data:{user}}=await auth.auth.getUser();if(!user)redirect("/login");
@@ -16,14 +16,14 @@ async function reply(formData:FormData){
  if(error)throw new Error("Could not send reply.");await db.from("support_conversations").update({updated_at:new Date().toISOString(),status:"pending"}).eq("id",conversationId);revalidatePath("/admin/support");
 }
 async function setStatus(formData:FormData){
- "use server";if(!await isAdminSessionValid())redirect("/login");
+ "use server";if(!await canAdminAccess("support"))redirect("/admin");
  const id=String(formData.get("conversation_id")||"");const status=String(formData.get("status")||"");
  if(!id||!["open","pending","closed"].includes(status))return;
  const {error}=await createAdminDb().from("support_conversations").update({status,updated_at:new Date().toISOString()}).eq("id",id);
  if(error)throw new Error("Could not update ticket.");revalidatePath("/admin/support");
 }
 export default async function SupportInbox(){
- if(!await isAdminSessionValid())redirect("/login");
+ if(!await canAdminAccess("support"))redirect("/admin");
  const db=createAdminDb();
  const [{data:threads,error},{data:allProfiles},{data:allEnrollments},{data:allPayments}] = await Promise.all([
   db.from("support_conversations").select("id,user_id,subject,status,created_at,updated_at").order("updated_at",{ascending:false}).limit(100),

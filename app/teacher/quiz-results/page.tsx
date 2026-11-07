@@ -2,11 +2,13 @@ import Link from "next/link";
 import {redirect} from "next/navigation";
 import {createSupabaseServerClient} from "@/lib/supabase-server";
 import {createAdminDb} from "@/lib/supabase/admin";
+import {canAdminAccess} from "@/lib/admin-session";
 export const dynamic="force-dynamic";
 export default async function TeacherQuizResultsPage(){
  const sb=await createSupabaseServerClient();const {data:{user}}=await sb.auth.getUser();if(!user)redirect("/login");
  const {data:profile}=await sb.from("profiles").select("role").eq("id",user.id).maybeSingle();
  if(profile?.role!=="teacher"&&profile?.role!=="admin")redirect("/login");
+ if(profile?.role==="admin"&&!await canAdminAccess("assessments"))redirect("/admin");
  const db=createAdminDb();
  const {data:courses}=await db.from("courses").select("id,title").eq("teacher_id",user.id);
  const courseIds=(courses||[]).map((c:any)=>c.id);

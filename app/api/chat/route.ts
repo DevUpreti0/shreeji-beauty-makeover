@@ -58,7 +58,8 @@ export async function POST(req:NextRequest){
   if(!membership)return NextResponse.json({error:"You do not have access to this conversation."},{status:403});
   const {data:saved,error}=await db.from("chat_messages").insert({conversation_id:conversationId,sender_id:user.id,body:message}).select("id,conversation_id,sender_id,body,created_at,edited_at,deleted_at").single();
   if(error||!saved)return NextResponse.json({error:"Message could not be sent."},{status:500});
-  await db.from("chat_conversations").update({updated_at:saved.created_at,last_message:message.slice(0,180)}).eq("id",conversationId);\n  await db.from("chat_participants").update({last_read_at:saved.created_at}).eq("conversation_id",conversationId).eq("user_id",user.id);
+  await db.from("chat_conversations").update({updated_at:saved.created_at,last_message:message.slice(0,180)}).eq("id",conversationId);
+  await db.from("chat_participants").update({last_read_at:saved.created_at}).eq("conversation_id",conversationId).eq("user_id",user.id);
   const {data:recipients}=await db.from("chat_participants").select("user_id").eq("conversation_id",conversationId).neq("user_id",user.id);
   if(recipients?.length){await db.from("user_notifications").insert(recipients.map(p=>({user_id:p.user_id,title:"New DuKu Chat message",body:(ctx.profile.full_name||"Someone")+" sent: "+message.slice(0,120),href:"/chat?conversationId="+conversationId,kind:"chat"})));}
   return NextResponse.json({message:saved});

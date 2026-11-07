@@ -6,13 +6,14 @@ export default function MeetingRoom({roomName,displayName,classId}:{roomName:str
  const target=useRef<HTMLDivElement>(null),apiRef=useRef<MeetingApi|null>(null),joinedAt=useRef<number|null>(null);
  const [connection,setConnection]=useState("Preparing your classroom…"),[joined,setJoined]=useState(false),[participants,setParticipants]=useState(0),[audioMuted,setAudioMuted]=useState(true),[videoMuted,setVideoMuted]=useState(true),[elapsed,setElapsed]=useState(0),[attempt,setAttempt]=useState(0),[loadError,setLoadError]=useState("");
  const command=(name:string)=>apiRef.current?.executeCommand?.(name);
+ const domain=(process.env.NEXT_PUBLIC_JITSI_DOMAIN||"meet.jit.si").replace(/^https?:\\/\\//,"").replace(/\\/$/,"");
  useEffect(()=>{
   let api:MeetingApi|undefined,disposed=false,hasJoined=false,script:HTMLScriptElement|null=null;
   const record=async(event:"joined"|"left")=>{try{await fetch("/api/live-classes/"+encodeURIComponent(classId)+"/attendance",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({event}),keepalive:event==="left"});}catch{}};
   const mount=()=>{
    if(disposed||!target.current||!window.JitsiMeetExternalAPI)return;
    setLoadError("");setConnection("Connecting to DuKu Meet…");
-   api=new window.JitsiMeetExternalAPI("meet.jit.si",{roomName:"ShreejiClass"+roomName,width:"100%",height:"100%",parentNode:target.current,userInfo:{displayName},
+   api=new window.JitsiMeetExternalAPI(domain,{roomName:"ShreejiClass"+roomName,width:"100%",height:"100%",parentNode:target.current,userInfo:{displayName},
     configOverwrite:{prejoinConfig:{enabled:true},startWithAudioMuted:true,disableDeepLinking:true,enableWelcomePage:false,hideConferenceSubject:false,hideConferenceTimer:false,disableInviteFunctions:true,enableNoAudioDetection:true,enableNoisyMicDetection:true,enableClosePage:true},
     interfaceConfigOverwrite:{APP_NAME:"DuKu Meet",NATIVE_APP_NAME:"DuKu Meet",MOBILE_APP_PROMO:false,SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,SHOW_BRAND_WATERMARK:false,SHOW_POWERED_BY:false,BRAND_WATERMARK_LINK:"",DEFAULT_BACKGROUND:"#080d17",DEFAULT_REMOTE_DISPLAY_NAME:"Class participant",DEFAULT_LOCAL_DISPLAY_NAME:"You",TOOLBAR_BUTTONS:["microphone","camera","closedcaptions","desktop","fullscreen","fodeviceselection","hangup","profile","chat","raisehand","videoquality","filmstrip","tileview","settings","select-background","mute-everyone"]}});
    apiRef.current=api;
@@ -32,7 +33,7 @@ export default function MeetingRoom({roomName,displayName,classId}:{roomName:str
   if(window.JitsiMeetExternalAPI)mount();else{
    const existing=document.querySelector<HTMLScriptElement>('script[data-duku-jitsi="true"]');
    if(existing){script=existing;if((existing as any).dataset.loaded==="true")mount();else{existing.addEventListener("load",mount,{once:true});existing.addEventListener("error",()=>{existing.remove();setLoadError("Could not load the meeting service. Check your internet connection and retry.");},{once:true});}}
-   else{script=document.createElement("script");script.src="https://meet.jit.si/external_api.js";script.async=true;script.dataset.dukuJitsi="true";script.onload=()=>{script!.dataset.loaded="true";mount();};script.onerror=()=>{script?.remove();setConnection("Meeting service unavailable");setLoadError("Could not load the meeting service. Check your internet connection and retry.");};document.head.appendChild(script);}
+   else{script=document.createElement("script");script.src="https://"+domain+"/external_api.js";script.async=true;script.dataset.dukuJitsi="true";script.onload=()=>{script!.dataset.loaded="true";mount();};script.onerror=()=>{script?.remove();setConnection("Meeting service unavailable");setLoadError("Could not load the meeting service. Check your internet connection and retry.");};document.head.appendChild(script);}
   }
   const onPageHide=()=>{if(hasJoined){hasJoined=false;void record("left");}};
   window.addEventListener("pagehide",onPageHide);

@@ -12,7 +12,7 @@ export async function POST(req:NextRequest){
   const db=createAdminDb(),{data:row}=await db.from("payments").select("id,student_id,course_id,amount_paise,status").eq("provider_order_id",txnid).eq("provider","payu").maybeSingle();
   if(!row)return NextResponse.redirect(new URL("/?payment=order-not-found",origin),303);
   if(row.status==="paid")return NextResponse.redirect(new URL("/student/receipts/"+row.id,origin),303);
-  const reverse=[salt,p.status||"","","","","",p.udf5||"",p.udf4||"",p.udf3||"",p.udf2||"",p.udf1||"",p.email||"",p.firstname||"",p.productinfo||"",p.amount||"",txnid,p.key||""].join("|");
+  const reverse=[salt,p.status||"","","","","","",p.udf5||"",p.udf4||"",p.udf3||"",p.udf2||"",p.udf1||"",p.email||"",p.firstname||"",p.productinfo||"",p.amount||"",txnid,p.key||""].join("|");
   const expected=sha512(p.additional_charges?String(p.additional_charges)+"|"+reverse:reverse);
   if(p.key!==key||!safeEqual(expected,p.hash||""))return NextResponse.redirect(new URL("/checkout/"+row.course_id+"?payment=invalid-response",origin),303);
   if(p.udf2!==row.student_id||p.udf1!==row.course_id||Math.round(Number(p.amount)*100)!==row.amount_paise)return NextResponse.redirect(new URL("/checkout/"+row.course_id+"?payment=details-mismatch",origin),303);

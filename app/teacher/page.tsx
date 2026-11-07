@@ -41,6 +41,13 @@ export default async function TeacherPage() {
   const publishedCourses = courseList.filter((c:any) => c.status === "published").length;
   const liveClasses = (classes || []).filter((c:any) => c.status === "live").length;
   const courseEnrollmentCount = (courseId:string) => (enrollments || []).filter((e:any) => e.course_id === courseId && ["active","paid","completed"].includes(e.status)).length;
+  const courseLearningStats = (courseId:string) => {
+    const mids=new Set((modules||[]).filter((m:any)=>m.course_id===courseId).map((m:any)=>m.id));
+    const lids=new Set((lessons||[]).filter((l:any)=>mids.has(l.module_id)).map((l:any)=>l.id));
+    const records=(lessonProgress||[]).filter((p:any)=>lids.has(p.lesson_id));
+    const done=records.filter((p:any)=>p.completed).length;
+    return {done,total:records.length,rate:records.length?Math.round(done/records.length*100):0};
+  };
 
   return <main className="portalPage">
     <header className="portalHeader">
@@ -112,10 +119,13 @@ export default async function TeacherPage() {
         <h2 style={{marginTop:0}}>My courses & learners</h2>
         {courseList.length ? courseList.map((c:any) => {
           const learners = courseEnrollmentCount(c.id);
+          const stats = courseLearningStats(c.id);
           return <article className="portalCourse" key={c.id}>
             <div style={{flex:1,minWidth:190}}>
               <b>{c.title}</b>
               <span>{c.status} · {learners} enrolled learner{learners===1?"":"s"}</span>
+              <small style={{display:"block",marginTop:10,opacity:.75}}>Learner lesson completion: {stats.rate}% · {stats.done}/{stats.total} recorded</small>
+              <div style={{height:7,maxWidth:320,background:"#ffffff20",borderRadius:20,overflow:"hidden",marginTop:7}}><div style={{height:"100%",width:stats.rate+"%",background:"linear-gradient(90deg,#756be0,#a98af2)"}}/></div>
             </div>
             <Link className="primary inlineButton" href={"/teacher/courses/"+c.id+"/content"}>Open lesson studio ↗</Link>
           </article>;

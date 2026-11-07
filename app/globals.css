@@ -16,3 +16,98 @@
 .profileGrid{display:grid;grid-template-columns:1fr 1fr;gap:19px}.profileGrid label{display:flex;flex-direction:column;gap:8px;font-size:11px;font-weight:700;color:#65564e}.profileGrid input,.profileGrid textarea{width:100%;border:1px solid #e6ddd5;background:#fffdfb;padding:13px 14px;outline:none;color:#332a26;border-radius:2px;font-size:13px}.profileGrid input:focus,.profileGrid textarea:focus{border-color:#a75e51}.profileGrid input:disabled{background:#f5f1ed;color:#8b817b}.profileBio{grid-column:1/-1}.profileGrid textarea{resize:vertical;min-height:95px}
 .profileSecurity{display:flex;flex-direction:column;gap:7px;padding:17px;background:#faf7f2;border:1px solid #eee5de;margin:22px 0}.profileSecurity strong{font-size:12px}.profileSecurity span{font-size:11px;line-height:1.7;color:#81766f}
 @media(max-width:650px){.profileEditor{padding:19px}.profileGrid{grid-template-columns:1fr}.profileBio{grid-column:auto}.profileIdentity{align-items:flex-start}.profileUpload{width:100%}}
+
+/* DUKU MEET FCA · DARK GLASS EXPERIENCE */
+:root{color-scheme:dark;--ink:#edf1f8;--muted:#9aa8bb;--cream:#080d17;--peach:#8bb6ff;--rose:#9c7bff;--line:#26344a;--green:#7de0c3}
+html,body{background:#080d17!important;color:#edf1f8!important}
+body{background:radial-gradient(ellipse at 15% 0%,#192640 0%,#0a1120 42%,#070b13 100%) fixed!important;overflow-x:hidden}
+.ownershipBanner{position:relative;z-index:100;background:rgba(7,12,22,.92);color:#c8d7f1;text-align:center;padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:1.1px;border-bottom:1px solid #4b5f87;backdrop-filter:blur(18px)}
+.topbar,.portalHeader{background:rgba(10,17,30,.76)!important;border-color:#28364d!important;backdrop-filter:blur(24px) saturate(160%);box-shadow:0 8px 35px #0003}
+.brand,.portalHeader .brand,.login,.textButton{color:#edf2ff!important}
+.brandmark{background:linear-gradient(135deg,#6c76b9,#b18cff)!important;color:#fff!important}
+.topbar nav button,.footerLinks button{color:#b6c4d8}
+.hero{background:radial-gradient(ellipse at 78% 45%,#29385a 0%,#111c31 45%,#0b1220 100%)!important;color:#f4f6ff}
+.heroCopy>p,.sectionHead p,.featureBand p,.infoPage>p{color:#b0bfd3}
+.hero h1,.section h2,.featureBand h2,.infoPage h2,.courseBody h3,.whyGrid h3{color:#f2f5ff}
+.hero h1 em,.section h2 em,.infoPage h2 em,.dashTop h2 em{color:#b49aff!important}
+.artOrb{background:linear-gradient(145deg,#596aa0,#9272b7)!important;box-shadow:0 30px 100px #7d79e044}
+.cardBack{background:linear-gradient(145deg,#303f65,#554575)!important;color:#eeeaff}
+.cardFront{background:linear-gradient(145deg,#313f62,#6d5b88)!important}
+.faceArt{color:#d4c6ff}
+.floatingNote,.authModal,.authCard,.courseCard,.courseBody,.portalPanel,.portalMetrics>div,.profileEditor,.profileGrid input,.profileGrid textarea,.profileSecurity,.dashPanel,.metricGrid>div,.authCard input,.authCard select,.filters input,.filters select{background:rgba(20,31,50,.78)!important;color:#edf2ff!important;border:1px solid rgba(150,174,220,.2)!important;box-shadow:0 18px 55px #0003,inset 0 1px #ffffff0a;backdrop-filter:blur(20px) saturate(140%)}
+.floatingNote{color:#dce7ff}
+.trustbar{background:rgba(14,23,39,.82)!important;border-color:#28364d!important;color:#c4d2e6}
+.trustbar span,.trustbar b,.courseMeta,.courseBody p,.whyGrid p,.courseBody .courseMeta{color:#a8b6cb!important}
+.section{background:transparent!important}
+.courseVisual,.miniThumb{background:linear-gradient(135deg,#283958,#645181)!important}
+.courseVisual>span{color:#e5dcff}
+.courseVisual label{background:#1a2941;color:#d6c9ff}
+.courseBottom{border-color:#33435c}
+.courseBottom button,.portalPanel a,.authFoot a,.backLink{color:#b9a4ff!important}
+.outline{border-color:#65799d!important;background:rgba(255,255,255,.035)!important;color:#dce7ff!important}
+.outline:hover{background:rgba(151,135,255,.14)!important}
+.primary,.lightButton{background:linear-gradient(120deg,#7669d9,#9b79e9)!important;border:1px solid #a994ff!important;color:white!important;box-shadow:0 8px 26px #7669d944}
+.featureBand{background:linear-gradient(115deg,#171f38,#2a2850)!important;color:#f4f4ff}
+.featureBand .eyebrow{color:#c7b6ff}
+.featureBand h2 em{color:#c4aaff}
+.featureStats{border-color:#ffffff30}
+.featureStats span{color:#c9d4e9}
+.whyGrid b{color:#ad9aff}
+footer{background:#060a12!important;border-top:1px solid #26344a;color:#edf2ff}
+footer p{color:#b6a5e9}
+footer small{color:#8796ad}
+.dashboard{background:transparent!important}
+.sideNav{background:rgba(12,20,35,.88)!important;border-right:1px solid #293954;backdrop-filter:blur(20px)}
+.sideNav button{color:#c4d1e6}
+.sideNav button.selected{background:#37345f;color:white}
+.dashMain,.portalPage,.authPage{background:transparent!important}
+.portalContent h1,.authCard h1,.portalPanel h2,.profileIdentityText strong{color:#f1f4ff!important}
+.portalContent>p,.authCard>p,.profilePage>p,.portalPanel p{color:#a8b6ca!important}
+.portalMetrics small,.profileGrid label,.profileIdentityText span,.profileSecurity span{color:#a4b4cc!important}
+.portalMetrics strong{color:#d8cbff}
+.portalCourse{border-color:#293954}
+.portalCourse span{color:#bba8ff}
+.portalLinks a{border-color:#344562;color:#d6cbff}
+.formError{background:#3a202b!important;color:#ffb8c6!important}
+.formMessage{background:#19352f!important;color:#9ce6c6!important}
+.authCard input,.authCard select,.profileGrid input,.profileGrid textarea,.filters input,.filters select{border-color:#3b4b67!important}
+.authCard input:focus,.profileGrid input:focus,.profileGrid textarea:focus{border-color:#9d8aff!important}
+.authCard input:disabled{background:#172338!important;color:#91a0b8!important}
+.profileAvatar{background:linear-gradient(135deg,#665b9d,#8b6eb0);color:#fff}
+.profileSecurity{background:rgba(100,111,160,.12)!important}
+.modalShade{background:#030712d9}
+.notice{background:#17243a;color:#eaf0ff;border-color:#46577a}
+.panelMenuTrigger{position:fixed;z-index:91;right:18px;top:66px;width:46px;height:46px;border-radius:15px;border:1px solid #8f8bd2;background:rgba(22,31,55,.82);color:#fff;font-size:30px;line-height:1;box-shadow:0 10px 35px #0005;backdrop-filter:blur(18px);cursor:pointer;display:grid;place-items:center;transition:transform .2s,background .2s}
+.panelMenuTrigger:hover{transform:translateY(-2px);background:#514b91}
+.panelDrawerShade{position:fixed;inset:0;z-index:120;background:#020611b8;backdrop-filter:blur(7px);display:flex;justify-content:flex-end;animation:veilIn .2s ease}
+.panelDrawer{width:min(370px,88vw);height:100%;padding:25px 22px;background:linear-gradient(155deg,rgba(31,44,72,.98),rgba(10,16,29,.99));border-left:1px solid #56658a;box-shadow:-25px 0 80px #0008;display:flex;flex-direction:column;overflow-y:auto;animation:drawerIn .25s ease}
+.panelDrawerHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:8px 0 25px;border-bottom:1px solid #ffffff20}
+.panelDrawerHead small,.panelDrawer>p{display:block;font-size:9px;letter-spacing:1.7px;color:#9c9fc9}
+.panelDrawerHead strong{display:block;font:22px 'Playfair Display';color:#fff;margin-top:8px}
+.panelDrawerHead button{border:0;background:#ffffff12;color:#fff;border-radius:10px;width:35px;height:35px;font-size:23px}
+.panelDrawer nav{display:grid;gap:7px;padding:20px 0}
+.panelDrawer nav a,.panelDrawerSignout{display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:#dce5fa;padding:13px 14px;border:1px solid transparent;border-radius:12px;font-size:13px;background:transparent}
+.panelDrawer nav a:hover,.panelDrawer nav a.active{background:#8e83db24;border-color:#8984c566;color:#fff}
+.panelDrawer nav a span,.panelDrawerSignout span{color:#b9aaff}
+.panelDrawerSignout{width:100%;border:1px solid #b17e9a66;background:#a7466e22;color:#ffd4e4;cursor:pointer}
+.panelDrawer>p{margin-top:auto;padding-top:24px;line-height:1.9;letter-spacing:.7px}
+.classPeople{margin:28px 0;padding:22px;border:1px solid #7384ac55;border-radius:20px;background:rgba(22,33,55,.62);backdrop-filter:blur(20px);box-shadow:0 18px 50px #0003}
+.classPeopleHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.classPeopleHead small{font-size:9px;letter-spacing:2px;color:#b7a9ff}.classPeopleHead h2{font:23px 'Playfair Display';margin:6px 0 0;color:#f1f3ff}.classPeopleHead>span{font-size:11px;color:#bdc9e0}
+.classPeopleGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.classPerson{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #ffffff14;border-radius:14px;background:#ffffff08;min-width:0}
+.classPerson img,.classPersonInitial{width:48px;height:48px;flex-shrink:0;object-fit:cover;border-radius:50%;border:1px solid #a89aff77}
+.classPersonInitial{display:grid;place-items:center;background:linear-gradient(135deg,#5e61a0,#9b72bd);font:22px 'Playfair Display';color:white}
+.classPerson>div:last-child{display:flex;flex-direction:column;gap:4px;min-width:0}.classPerson b{font-size:12px;color:#f4f5ff}.classPerson span{font-size:10px;color:#b6c3da;overflow-wrap:anywhere}.classPerson small{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:#b9aaff}
+.meetShell{padding:18px!important;border-radius:22px!important}
+.meetStageHead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:3px 4px 14px}
+.meetWatermark{display:flex;align-items:center;gap:9px;color:#fff}.meetWatermark>span{width:31px;height:31px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(135deg,#7169d5,#b18cff);font-size:19px}.meetWatermark b{font-size:14px;letter-spacing:.4px}.meetWatermark small{font-size:8px;letter-spacing:1.2px;color:#9fafd0;margin-left:5px}
+.meetStatus{font-size:10px;color:#bfcaff}.meetFrame{position:relative;border:1px solid #56678b;border-radius:15px;overflow:hidden;background:#080d17;min-height:640px}.meetFrameInner{width:100%;height:640px}.meetFootnote{font-size:11px;color:#aab8ce!important;margin:13px 3px 0}
+.meetBrandSmall{font-size:10px;letter-spacing:2px;color:#b8aaff;font-weight:700}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes drawerIn{from{transform:translateX(35px);opacity:.7}to{transform:translateX(0);opacity:1}}
+@keyframes veilIn{from{opacity:0}to{opacity:1}}
+body:not(.reduce-motion) .portalContent,body:not(.reduce-motion) .section,body:not(.reduce-motion) .heroCopy,body:not(.reduce-motion) .courseCard,body:not(.reduce-motion) .portalPanel,body:not(.reduce-motion) .authCard{animation:fadeUp .65s ease both}
+.courseCard:nth-child(2){animation-delay:.07s!important}.courseCard:nth-child(3){animation-delay:.14s!important}
+button,a,.courseCard,.portalPanel,.profileEditor{transition:transform .22s ease,border-color .22s ease,background .22s ease,box-shadow .22s ease}
+@media(max-width:650px){.panelMenuTrigger{top:78px;right:12px;width:42px;height:42px}.portalHeader{padding:0 14px}.classPeople{padding:16px}.classPeopleHead{align-items:flex-start;flex-direction:column}.meetFrame,.meetFrameInner{min-height:520px;height:520px}.meetWatermark{flex-wrap:wrap}.meetWatermark small{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}

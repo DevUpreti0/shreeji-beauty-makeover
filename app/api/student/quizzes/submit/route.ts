@@ -5,6 +5,7 @@ export const dynamic="force-dynamic";
 export async function POST(req:NextRequest){
  try{
   const sb=await createSupabaseServerClient();const {data:{user}}=await sb.auth.getUser();if(!user)return NextResponse.json({error:"Please sign in first."},{status:401});
+  const {data:profile}=await sb.from("profiles").select("role").eq("id",user.id).maybeSingle();if(profile?.role!=="student")return NextResponse.json({error:"Student access required."},{status:403});
   const body=await req.json();const quizId=String(body.quizId||"");const answers=body.answers;
   if(!quizId||!Array.isArray(answers)||answers.length>50||answers.some((x:any)=>!Number.isInteger(x)||x<0||x>5))return NextResponse.json({error:"Invalid quiz answers."},{status:400});
   const db=createAdminDb();

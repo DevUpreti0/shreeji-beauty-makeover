@@ -1,10 +1,10 @@
 import Link from "next/link";
 import {redirect} from "next/navigation";
-import {isAdminSessionValid} from "@/lib/admin-session";
+import {canAdminAccess} from "@/lib/admin-session";
 import {createAdminDb} from "@/lib/supabase/admin";
 export const dynamic="force-dynamic";
 export default async function LiveAttendancePage(){
- if(!await isAdminSessionValid())redirect("/login");const db=createAdminDb();
+ if(!await canAdminAccess("live-classes"))redirect("/admin");const db=createAdminDb();
  const {data:classes,error}=await db.from("live_classes").select("id,title,starts_at,duration_minutes,status,course_id").order("starts_at",{ascending:false}).limit(100);
  const ids=(classes||[]).map(c=>c.id);const {data:attendees}=ids.length?await db.from("live_class_attendance").select("id,live_class_id,user_id,joined_at,left_at").in("live_class_id",ids).order("joined_at",{ascending:false}):{data:[] as any[]};
  const userIds=[...new Set((attendees||[]).map(a=>a.user_id))];const {data:profiles}=userIds.length?await db.from("profiles").select("id,full_name,role").in("id",userIds):{data:[] as any[]};const names=new Map((profiles||[]).map(p=>[p.id,p.full_name||"Learner"]));

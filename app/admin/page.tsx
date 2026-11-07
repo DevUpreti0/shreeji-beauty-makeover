@@ -32,7 +32,7 @@ export default async function AdminPage(){
  let recent:any[]=[];let error="";
  try{
   const db=await createSupabaseServerClient();
-  const count=async(table:string,column?:string,value?:string)=>{const q=db.from(table).select("*",{count:"exact",head:true});const result=column?q.eq(column,value):q;return result;};
+  const count=async(table:string,column?:string,value?:string):Promise<any>=>{const q=(db as any).from(table).select("*",{count:"exact",head:true});return column?q.eq(column,value):q;};
   const jobs=await Promise.all([
    access.users?count("profiles"):Promise.resolve({count:0,error:null}),
    access.users?count("profiles","role","student"):Promise.resolve({count:0,error:null}),

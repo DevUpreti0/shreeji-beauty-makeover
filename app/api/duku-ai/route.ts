@@ -28,11 +28,12 @@ export async function POST(req:NextRequest){
     db.from("courses").select("id,title,description,category,level,price_paise").eq("status","published").order("created_at",{ascending:false}).limit(100),
     db.from("duku_ai_knowledge_base").select("id,category,question,answer,keywords").eq("is_published",true).order("sort_order").order("updated_at",{ascending:false}).limit(300)
    ]);
-   const normalized=question.toLowerCase();
-   const words=normalized.split(/[^a-z0-9]+/).filter((w:string)=>w.length>2);
-   const scored=(faqs||[]).map((f:any)=>{const hay=[f.question,f.category,...(f.keywords||[])].join(" ").toLowerCase();const score=words.reduce((n:number,w:string)=>n+(hay.includes(w)?(f.keywords?.some((k:string)=>k.toLowerCase()===w)?3:1):0),0);return {f,score};}).sort((a:any,b:any)=>b.score-a.score);
+   const normalized=question.toLowerCase().replace(/[^a-z0-9\\s]/g," ").replace(/\\s+/g," ").trim();
+   const stop=new Set(["the","and","for","with","from","that","this","what","when","where","which","how","can","could","would","should","does","do","did","you","your","are","is","was","were","have","has","had","please","tell","about","want","need","help","get","get","my","our"]);
+   const words=[...new Set(normalized.split(" ").filter((w:string)=>w.length>2&&!stop.has(w)))];
+   const scored=(faqs||[]).map((f:any)=>{const questionText=String(f.question||"").toLowerCase();const keys=(f.keywords||[]).map((k:string)=>String(k).toLowerCase());const hay=[questionText,f.category,...keys].join(" ").toLowerCase();const keywordHits=words.filter((w:string)=>keys.some((k:string)=>k===w||k.includes(w)||w.includes(k))).length;const phraseMatch=normalized.length>5&&(questionText.includes(normalized)||normalized.includes(questionText));const wordHits=words.filter((w:string)=>hay.includes(w)).length;const score=(phraseMatch?10:0)+(keywordHits*3)+wordHits;return {f,score,phraseMatch,keywordHits,wordHits};}).sort((x:any,y:any)=>y.score-x.score);
    const best=scored[0];
-   if(best&&best.score>=2)return NextResponse.json({answer:best.f.answer,links:[],resolved:true,source:"knowledge"});
+   if(best&&(best.phraseMatch||best.keywordHits>=1&&best.wordHits>=2||best.wordHits>=3))return NextResponse.json({answer:best.f.answer,links:[],resolved:true,source:"knowledge"});
    return NextResponse.json(answerFor(question,courses||[]));
   }
   if(action==="handoff"){
